@@ -14,19 +14,34 @@ import (
 	openapiclient "github.com/citypay/citypay-api-client-go"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"os"
 	"testing"
 )
 
 func Test_citypay_DirectPostApiService(t *testing.T) {
 
+	cpClientId := os.Getenv("CP_CLIENT_ID")
+	cpLicenceKey := os.Getenv("CP_LICENCE_KEY")
+	//cpMerchantId64, _ := strconv.Atoi(os.Getenv("CP_MERCHANT_ID"))
+	//cpMerchantId := int32(cpMerchantId64)
+
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
+
+	apiKey := openapiclient.APIKey{
+		Key:    openapiclient.GenerateApiKey(cpClientId, cpLicenceKey),
+		Prefix: "",
+	}
+	sandboxContext := context.WithValue(context.WithValue(
+		context.Background(),
+		openapiclient.ContextAPIKeys, map[string]openapiclient.APIKey{"cp-api-key": apiKey}),
+		openapiclient.ContextServerIndex, 1) // Use sandbox server
 
 	t.Run("Test DirectPostApiService DirectCResAuthRequest", func(t *testing.T) {
 
 		var uuid string
 
-		resp, httpRes, err := apiClient.DirectPostApi.DirectCResAuthRequest(context.Background(), uuid).Execute()
+		resp, httpRes, err := apiClient.DirectPostApi.DirectCResAuthRequest(sandboxContext, uuid).Execute()
 
 		require.Nil(t, err)
 		require.NotNil(t, resp)
@@ -38,7 +53,7 @@ func Test_citypay_DirectPostApiService(t *testing.T) {
 
 		var uuid string
 
-		resp, httpRes, err := apiClient.DirectPostApi.DirectCResTokeniseRequest(context.Background(), uuid).Execute()
+		resp, httpRes, err := apiClient.DirectPostApi.DirectCResTokeniseRequest(sandboxContext, uuid).Execute()
 
 		require.Nil(t, err)
 		require.NotNil(t, resp)
@@ -48,7 +63,7 @@ func Test_citypay_DirectPostApiService(t *testing.T) {
 
 	t.Run("Test DirectPostApiService DirectPostAuthRequest", func(t *testing.T) {
 
-		resp, httpRes, err := apiClient.DirectPostApi.DirectPostAuthRequest(context.Background()).Execute()
+		resp, httpRes, err := apiClient.DirectPostApi.DirectPostAuthRequest(sandboxContext).Execute()
 
 		require.Nil(t, err)
 		require.NotNil(t, resp)
@@ -58,7 +73,11 @@ func Test_citypay_DirectPostApiService(t *testing.T) {
 
 	t.Run("Test DirectPostApiService DirectPostTokeniseRequest", func(t *testing.T) {
 
-		resp, httpRes, err := apiClient.DirectPostApi.DirectPostTokeniseRequest(context.Background()).Execute()
+		model := openapiclient.NewDirectPostRequest(1, getValidCardNumber(), 1, 2028, generateRandomId(), "163DBAB194D743866A9BCC7FC9C8A88FCD99C6BBBF08D619291212D1B91EE12E")
+		model.SetRedirectFailure("https://www.domain.com")
+		model.SetRedirectSuccess("https://www.domain.com")
+
+		resp, httpRes, err := apiClient.DirectPostApi.DirectPostTokeniseRequest(sandboxContext).DirectPostRequest(*model).Execute()
 
 		require.Nil(t, err)
 		require.NotNil(t, resp)
@@ -68,7 +87,14 @@ func Test_citypay_DirectPostApiService(t *testing.T) {
 
 	t.Run("Test DirectPostApiService TokenRequest", func(t *testing.T) {
 
-		resp, httpRes, err := apiClient.DirectPostApi.TokenRequest(context.Background()).Execute()
+		token := generateToken(apiClient, sandboxContext)
+
+		model := openapiclient.NewDirectTokenAuthRequest()
+		model.SetRedirectFailure("https://www.domain.com")
+		model.SetRedirectSuccess("https://www.domain.com")
+		model.SetToken(token)
+
+		resp, httpRes, err := apiClient.DirectPostApi.TokenRequest(sandboxContext).DirectTokenAuthRequest(*model).Execute()
 
 		require.Nil(t, err)
 		require.NotNil(t, resp)

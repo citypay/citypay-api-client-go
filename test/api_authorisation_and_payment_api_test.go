@@ -14,17 +14,49 @@ import (
 	openapiclient "github.com/citypay/citypay-api-client-go"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"os"
+	"strconv"
 	"testing"
 )
 
+func generateTransaction(client *openapiclient.APIClient, sandboxContext context.Context) openapiclient.AuthResponse {
+
+	cpMerchantId64, _ := strconv.Atoi(os.Getenv("CP_MERCHANT_ID"))
+	cpMerchantId := int32(cpMerchantId64)
+
+	resp, _, _ := client.AuthorisationAndPaymentApi.AuthorisationRequest(
+		sandboxContext).
+		AuthRequest(*openapiclient.NewAuthRequest(1, getValidCardNumber(), 12, 2028, generateRandomId(), cpMerchantId)).
+		Execute()
+
+	return resp.GetAuthResponse()
+}
+
 func Test_citypay_AuthorisationAndPaymentApiService(t *testing.T) {
+
+	cpClientId := os.Getenv("CP_CLIENT_ID")
+	cpLicenceKey := os.Getenv("CP_LICENCE_KEY")
+	cpMerchantId64, _ := strconv.Atoi(os.Getenv("CP_MERCHANT_ID"))
+	cpMerchantId := int32(cpMerchantId64)
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
 
+	apiKey := openapiclient.APIKey{
+		Key:    openapiclient.GenerateApiKey(cpClientId, cpLicenceKey),
+		Prefix: "",
+	}
+	sandboxContext := context.WithValue(context.WithValue(
+		context.Background(),
+		openapiclient.ContextAPIKeys, map[string]openapiclient.APIKey{"cp-api-key": apiKey}),
+		openapiclient.ContextServerIndex, 1) // Use sandbox server
+
 	t.Run("Test AuthorisationAndPaymentApiService AuthorisationRequest", func(t *testing.T) {
 
-		resp, httpRes, err := apiClient.AuthorisationAndPaymentApi.AuthorisationRequest(context.Background()).Execute()
+		resp, httpRes, err := apiClient.AuthorisationAndPaymentApi.AuthorisationRequest(
+			sandboxContext).
+			AuthRequest(*openapiclient.NewAuthRequest(1, getValidCardNumber(), 12, 2028, generateRandomId(), cpMerchantId)).
+			Execute()
 
 		require.Nil(t, err)
 		require.NotNil(t, resp)
@@ -34,7 +66,9 @@ func Test_citypay_AuthorisationAndPaymentApiService(t *testing.T) {
 
 	t.Run("Test AuthorisationAndPaymentApiService BinRangeLookupRequest", func(t *testing.T) {
 
-		resp, httpRes, err := apiClient.AuthorisationAndPaymentApi.BinRangeLookupRequest(context.Background()).Execute()
+		resp, httpRes, err := apiClient.AuthorisationAndPaymentApi.BinRangeLookupRequest(
+			sandboxContext).BinLookup(*openapiclient.NewBinLookup(543712)).
+			Execute()
 
 		require.Nil(t, err)
 		require.NotNil(t, resp)
@@ -44,7 +78,19 @@ func Test_citypay_AuthorisationAndPaymentApiService(t *testing.T) {
 
 	t.Run("Test AuthorisationAndPaymentApiService CResRequest", func(t *testing.T) {
 
-		resp, httpRes, err := apiClient.AuthorisationAndPaymentApi.CResRequest(context.Background()).Execute()
+		auth, _, _ := apiClient.AuthorisationAndPaymentApi.AuthorisationRequest(
+			sandboxContext).
+			AuthRequest(*openapiclient.NewAuthRequest(1, getValidCardNumber(), 12, 2028, generateRandomId(), cpMerchantId)).
+			Execute()
+
+		auth.GetAuthResponseOk()
+		model := openapiclient.NewCResAuthRequest()
+		model.SetCres("x90+vZ/7Ll05Vid/jPfQn8adw+4D/vRDUGT19kndW97Hfirbv66ycfSp8jNlvy7PkHbx44NEt3vo...")
+
+		resp, httpRes, err := apiClient.AuthorisationAndPaymentApi.
+			CResRequest(sandboxContext).
+			CResAuthRequest(*model).
+			Execute()
 
 		require.Nil(t, err)
 		require.NotNil(t, resp)
@@ -54,7 +100,15 @@ func Test_citypay_AuthorisationAndPaymentApiService(t *testing.T) {
 
 	t.Run("Test AuthorisationAndPaymentApiService CaptureRequest", func(t *testing.T) {
 
-		resp, httpRes, err := apiClient.AuthorisationAndPaymentApi.CaptureRequest(context.Background()).Execute()
+		transaction := generateTransaction(apiClient, sandboxContext)
+
+		model := openapiclient.NewCaptureRequest(cpMerchantId)
+		model.SetTransno(transaction.GetTransno())
+
+		resp, httpRes, err := apiClient.AuthorisationAndPaymentApi.
+			CaptureRequest(sandboxContext).
+			CaptureRequest(*model).
+			Execute()
 
 		require.Nil(t, err)
 		require.NotNil(t, resp)
@@ -64,7 +118,7 @@ func Test_citypay_AuthorisationAndPaymentApiService(t *testing.T) {
 
 	t.Run("Test AuthorisationAndPaymentApiService CreatePaymentIntent", func(t *testing.T) {
 
-		resp, httpRes, err := apiClient.AuthorisationAndPaymentApi.CreatePaymentIntent(context.Background()).Execute()
+		resp, httpRes, err := apiClient.AuthorisationAndPaymentApi.CreatePaymentIntent(sandboxContext).PaymentIntent(*openapiclient.NewPaymentIntent(1, generateRandomId())).Execute()
 
 		require.Nil(t, err)
 		require.NotNil(t, resp)
@@ -74,7 +128,7 @@ func Test_citypay_AuthorisationAndPaymentApiService(t *testing.T) {
 
 	t.Run("Test AuthorisationAndPaymentApiService PaResRequest", func(t *testing.T) {
 
-		resp, httpRes, err := apiClient.AuthorisationAndPaymentApi.PaResRequest(context.Background()).Execute()
+		resp, httpRes, err := apiClient.AuthorisationAndPaymentApi.PaResRequest(sandboxContext).Execute()
 
 		require.Nil(t, err)
 		require.NotNil(t, resp)
@@ -84,7 +138,9 @@ func Test_citypay_AuthorisationAndPaymentApiService(t *testing.T) {
 
 	t.Run("Test AuthorisationAndPaymentApiService RefundRequest", func(t *testing.T) {
 
-		resp, httpRes, err := apiClient.AuthorisationAndPaymentApi.RefundRequest(context.Background()).Execute()
+		model := openapiclient.NewRefundRequest(1, generateRandomId(), cpMerchantId, 1)
+
+		resp, httpRes, err := apiClient.AuthorisationAndPaymentApi.RefundRequest(sandboxContext).RefundRequest(*model).Execute()
 
 		require.Nil(t, err)
 		require.NotNil(t, resp)
@@ -94,7 +150,12 @@ func Test_citypay_AuthorisationAndPaymentApiService(t *testing.T) {
 
 	t.Run("Test AuthorisationAndPaymentApiService RetrievalRequest", func(t *testing.T) {
 
-		resp, httpRes, err := apiClient.AuthorisationAndPaymentApi.RetrievalRequest(context.Background()).Execute()
+		transaction := generateTransaction(apiClient, sandboxContext)
+
+		model := openapiclient.NewRetrieveRequest(cpMerchantId)
+		model.SetTransno(*transaction.Transno)
+
+		resp, httpRes, err := apiClient.AuthorisationAndPaymentApi.RetrievalRequest(sandboxContext).RetrieveRequest(*model).Execute()
 
 		require.Nil(t, err)
 		require.NotNil(t, resp)
@@ -104,7 +165,15 @@ func Test_citypay_AuthorisationAndPaymentApiService(t *testing.T) {
 
 	t.Run("Test AuthorisationAndPaymentApiService VoidRequest", func(t *testing.T) {
 
-		resp, httpRes, err := apiClient.AuthorisationAndPaymentApi.VoidRequest(context.Background()).Execute()
+		transaction := generateTransaction(apiClient, sandboxContext)
+
+		model := openapiclient.NewVoidRequest(cpMerchantId)
+		model.SetTransno(*transaction.Transno)
+
+		resp, httpRes, err := apiClient.AuthorisationAndPaymentApi.
+			VoidRequest(sandboxContext).
+			VoidRequest(*model).
+			Execute()
 
 		require.Nil(t, err)
 		require.NotNil(t, resp)

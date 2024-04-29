@@ -14,129 +14,206 @@ import (
 	openapiclient "github.com/citypay/citypay-api-client-go"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"net/http"
+	"os"
+	"strconv"
 	"testing"
 )
 
+func createAccount(client *openapiclient.APIClient, sandboxContext context.Context) (*openapiclient.CardHolderAccount, *http.Response, error) {
+
+	model := openapiclient.NewAccountCreate(generateRandomId())
+	model.SetContact(*openapiclient.NewContactDetailsWithDefaults())
+
+	return client.CardHolderAccountApi.AccountCreate(sandboxContext).AccountCreate(*model).Execute()
+
+}
+
+func deleteAccount(client *openapiclient.APIClient, sandboxContext context.Context, account openapiclient.CardHolderAccount) {
+	client.CardHolderAccountApi.AccountDeleteRequest(sandboxContext, account.GetAccountId()).Execute()
+}
+
+func registerCard(client *openapiclient.APIClient, sandboxContext context.Context, account openapiclient.CardHolderAccount) (
+	*openapiclient.CardHolderAccount, *http.Response, error) {
+
+	return client.CardHolderAccountApi.
+		AccountCardRegisterRequest(sandboxContext, account.GetAccountId()).
+		RegisterCard(*openapiclient.NewRegisterCard(getValidCardNumber(), 12, 2028)).
+		Execute()
+}
+
+func createAccountWithCard(client *openapiclient.APIClient, sandboxContext context.Context) *openapiclient.CardHolderAccount {
+	account, _, _ := createAccount(client, sandboxContext)
+	accountWithCard, _, _ := registerCard(client, sandboxContext, *account)
+	return accountWithCard
+}
+
 func Test_citypay_CardHolderAccountApiService(t *testing.T) {
+
+	cpClientId := os.Getenv("CP_CLIENT_ID")
+	cpLicenceKey := os.Getenv("CP_LICENCE_KEY")
+	cpMerchantId64, _ := strconv.Atoi(os.Getenv("CP_MERCHANT_ID"))
+	cpMerchantId := int32(cpMerchantId64)
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
 
-	t.Run("Test CardHolderAccountApiService AccountCardDeleteRequest", func(t *testing.T) {
+	apiKey := openapiclient.APIKey{
+		Key:    openapiclient.GenerateApiKey(cpClientId, cpLicenceKey),
+		Prefix: "",
+	}
+	sandboxContext := context.WithValue(context.WithValue(
+		context.Background(),
+		openapiclient.ContextAPIKeys, map[string]openapiclient.APIKey{"cp-api-key": apiKey}),
+		openapiclient.ContextServerIndex, 1) // Use sandbox server
 
-		var accountid string
-		var cardId string
+	t.Run("Test CardHolderAccountApiService AccountCreate", func(t *testing.T) {
 
-		resp, httpRes, err := apiClient.CardHolderAccountApi.AccountCardDeleteRequest(context.Background(), accountid, cardId).Execute()
+		account, httpRes, err := createAccount(apiClient, sandboxContext)
+
+		require.Nil(t, err)
+		require.NotNil(t, account)
+		assert.Equal(t, 200, httpRes.StatusCode)
+
+		deleteAccount(apiClient, sandboxContext, *account)
+	})
+
+	t.Run("Test CardHolderAccountApiService AccountDeleteRequest", func(t *testing.T) {
+
+		account, _, _ := createAccount(apiClient, sandboxContext)
+
+		resp, httpRes, err := apiClient.CardHolderAccountApi.AccountDeleteRequest(sandboxContext, account.GetAccountId()).Execute()
 
 		require.Nil(t, err)
 		require.NotNil(t, resp)
 		assert.Equal(t, 200, httpRes.StatusCode)
+
+	})
+
+	t.Run("Test CardHolderAccountApiService AccountCardDeleteRequest", func(t *testing.T) {
+
+		account := createAccountWithCard(apiClient, sandboxContext)
+
+		resp, httpRes, err := apiClient.CardHolderAccountApi.
+			AccountCardDeleteRequest(sandboxContext, account.GetAccountId(), account.GetCards()[0].GetCardId()).
+			Execute()
+
+		require.Nil(t, err)
+		require.NotNil(t, resp)
+		assert.Equal(t, 200, httpRes.StatusCode)
+
+		deleteAccount(apiClient, sandboxContext, *account)
 
 	})
 
 	t.Run("Test CardHolderAccountApiService AccountCardRegisterRequest", func(t *testing.T) {
 
-		var accountid string
+		account, _, _ := createAccount(apiClient, sandboxContext)
 
-		resp, httpRes, err := apiClient.CardHolderAccountApi.AccountCardRegisterRequest(context.Background(), accountid).Execute()
+		resp, httpRes, err := registerCard(apiClient, sandboxContext, *account)
 
 		require.Nil(t, err)
 		require.NotNil(t, resp)
 		assert.Equal(t, 200, httpRes.StatusCode)
+
+		deleteAccount(apiClient, sandboxContext, *account)
 
 	})
 
 	t.Run("Test CardHolderAccountApiService AccountCardStatusRequest", func(t *testing.T) {
 
-		var accountid string
-		var cardId string
+		account := createAccountWithCard(apiClient, sandboxContext)
 
-		resp, httpRes, err := apiClient.CardHolderAccountApi.AccountCardStatusRequest(context.Background(), accountid, cardId).Execute()
+		resp, httpRes, err := apiClient.CardHolderAccountApi.
+			AccountCardStatusRequest(sandboxContext, account.GetAccountId(), account.GetCards()[0].GetCardId()).
+			CardStatus(*openapiclient.NewCardStatus()).
+			Execute()
 
 		require.Nil(t, err)
 		require.NotNil(t, resp)
 		assert.Equal(t, 200, httpRes.StatusCode)
+
+		deleteAccount(apiClient, sandboxContext, *account)
 
 	})
 
 	t.Run("Test CardHolderAccountApiService AccountChangeContactRequest", func(t *testing.T) {
 
-		var accountid string
+		account, _, _ := createAccount(apiClient, sandboxContext)
 
-		resp, httpRes, err := apiClient.CardHolderAccountApi.AccountChangeContactRequest(context.Background(), accountid).Execute()
-
-		require.Nil(t, err)
-		require.NotNil(t, resp)
-		assert.Equal(t, 200, httpRes.StatusCode)
-
-	})
-
-	t.Run("Test CardHolderAccountApiService AccountCreate", func(t *testing.T) {
-
-		resp, httpRes, err := apiClient.CardHolderAccountApi.AccountCreate(context.Background()).Execute()
+		resp, httpRes, err := apiClient.CardHolderAccountApi.
+			AccountChangeContactRequest(sandboxContext, account.GetAccountId()).
+			ContactDetails(*openapiclient.NewContactDetailsWithDefaults()).
+			Execute()
 
 		require.Nil(t, err)
 		require.NotNil(t, resp)
 		assert.Equal(t, 200, httpRes.StatusCode)
 
-	})
-
-	t.Run("Test CardHolderAccountApiService AccountDeleteRequest", func(t *testing.T) {
-
-		var accountid string
-
-		resp, httpRes, err := apiClient.CardHolderAccountApi.AccountDeleteRequest(context.Background(), accountid).Execute()
-
-		require.Nil(t, err)
-		require.NotNil(t, resp)
-		assert.Equal(t, 200, httpRes.StatusCode)
+		deleteAccount(apiClient, sandboxContext, *account)
 
 	})
 
 	t.Run("Test CardHolderAccountApiService AccountExistsRequest", func(t *testing.T) {
 
-		var accountid string
+		account, _, _ := createAccount(apiClient, sandboxContext)
 
-		resp, httpRes, err := apiClient.CardHolderAccountApi.AccountExistsRequest(context.Background(), accountid).Execute()
+		resp, httpRes, err := apiClient.CardHolderAccountApi.AccountExistsRequest(sandboxContext, account.GetAccountId()).Execute()
 
 		require.Nil(t, err)
 		require.NotNil(t, resp)
 		assert.Equal(t, 200, httpRes.StatusCode)
+
+		deleteAccount(apiClient, sandboxContext, *account)
 
 	})
 
 	t.Run("Test CardHolderAccountApiService AccountRetrieveRequest", func(t *testing.T) {
 
-		var accountid string
+		account, _, _ := createAccount(apiClient, sandboxContext)
 
-		resp, httpRes, err := apiClient.CardHolderAccountApi.AccountRetrieveRequest(context.Background(), accountid).Execute()
+		resp, httpRes, err := apiClient.CardHolderAccountApi.AccountRetrieveRequest(sandboxContext, account.GetAccountId()).Execute()
 
 		require.Nil(t, err)
 		require.NotNil(t, resp)
 		assert.Equal(t, 200, httpRes.StatusCode)
+
+		deleteAccount(apiClient, sandboxContext, *account)
 
 	})
 
 	t.Run("Test CardHolderAccountApiService AccountStatusRequest", func(t *testing.T) {
 
-		var accountid string
+		account, _, _ := createAccount(apiClient, sandboxContext)
 
-		resp, httpRes, err := apiClient.CardHolderAccountApi.AccountStatusRequest(context.Background(), accountid).Execute()
+		resp, httpRes, err := apiClient.CardHolderAccountApi.
+			AccountStatusRequest(sandboxContext, account.GetAccountId()).
+			AccountStatus(*openapiclient.NewAccountStatus()).
+			Execute()
 
 		require.Nil(t, err)
 		require.NotNil(t, resp)
 		assert.Equal(t, 200, httpRes.StatusCode)
+
+		deleteAccount(apiClient, sandboxContext, *account)
 
 	})
 
 	t.Run("Test CardHolderAccountApiService ChargeRequest", func(t *testing.T) {
 
-		resp, httpRes, err := apiClient.CardHolderAccountApi.ChargeRequest(context.Background()).Execute()
+		account, _, _ := createAccount(apiClient, sandboxContext)
+
+		card, _, _ := registerCard(apiClient, sandboxContext, *account)
+
+		resp, httpRes, err := apiClient.CardHolderAccountApi.ChargeRequest(sandboxContext).
+			ChargeRequest(*openapiclient.NewChargeRequest(1, generateRandomId(), cpMerchantId, card.GetCards()[0].GetToken())).
+			Execute()
 
 		require.Nil(t, err)
 		require.NotNil(t, resp)
 		assert.Equal(t, 200, httpRes.StatusCode)
+
+		deleteAccount(apiClient, sandboxContext, *account)
 
 	})
 
