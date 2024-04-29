@@ -14,17 +14,40 @@ import (
 	openapiclient "github.com/citypay/citypay-api-client-go"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"os"
 	"testing"
+	"time"
 )
 
 func Test_citypay_BatchProcessingApiService(t *testing.T) {
 
+	cpClientId := os.Getenv("CP_CLIENT_ID")
+	cpLicenceKey := os.Getenv("CP_LICENCE_KEY")
+	//cpMerchantId64, _ := strconv.Atoi(os.Getenv("CP_MERCHANT_ID"))
+	//cpMerchantId := int32(cpMerchantId64)
+
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
 
+	apiKey := openapiclient.APIKey{
+		Key:    openapiclient.GenerateApiKey(cpClientId, cpLicenceKey),
+		Prefix: "",
+	}
+	sandboxContext := context.WithValue(context.WithValue(
+		context.Background(),
+		openapiclient.ContextAPIKeys, map[string]openapiclient.APIKey{"cp-api-key": apiKey}),
+		openapiclient.ContextServerIndex, 1) // Use sandbox server
+
 	t.Run("Test BatchProcessingApiService BatchProcessRequest", func(t *testing.T) {
 
-		resp, httpRes, err := apiClient.BatchProcessingApi.BatchProcessRequest(context.Background()).Execute()
+		account, _, _ := createAccount(apiClient, sandboxContext)
+
+		transactions := []openapiclient.BatchTransaction{*openapiclient.NewBatchTransaction(account.GetAccountId(), 1)}
+
+		resp, httpRes, err := apiClient.BatchProcessingApi.
+			BatchProcessRequest(sandboxContext).
+			ProcessBatchRequest(*openapiclient.NewProcessBatchRequest(time.Now().Format(time.RFC3339), 1, transactions)).
+			Execute()
 
 		require.Nil(t, err)
 		require.NotNil(t, resp)
@@ -34,7 +57,7 @@ func Test_citypay_BatchProcessingApiService(t *testing.T) {
 
 	t.Run("Test BatchProcessingApiService BatchRetrieveRequest", func(t *testing.T) {
 
-		resp, httpRes, err := apiClient.BatchProcessingApi.BatchRetrieveRequest(context.Background()).Execute()
+		resp, httpRes, err := apiClient.BatchProcessingApi.BatchRetrieveRequest(sandboxContext).Execute()
 
 		require.Nil(t, err)
 		require.NotNil(t, resp)
@@ -44,7 +67,7 @@ func Test_citypay_BatchProcessingApiService(t *testing.T) {
 
 	t.Run("Test BatchProcessingApiService CheckBatchStatusRequest", func(t *testing.T) {
 
-		resp, httpRes, err := apiClient.BatchProcessingApi.CheckBatchStatusRequest(context.Background()).Execute()
+		resp, httpRes, err := apiClient.BatchProcessingApi.CheckBatchStatusRequest(sandboxContext).Execute()
 
 		require.Nil(t, err)
 		require.NotNil(t, resp)

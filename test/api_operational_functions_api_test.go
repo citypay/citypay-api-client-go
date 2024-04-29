@@ -14,27 +14,35 @@ import (
 	openapiclient "github.com/citypay/citypay-api-client-go"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"os"
+	"strconv"
 	"testing"
 )
 
 func Test_citypay_OperationalFunctionsApiService(t *testing.T) {
 
+	cpClientId := os.Getenv("CP_CLIENT_ID")
+	cpLicenceKey := os.Getenv("CP_LICENCE_KEY")
+	cpMerchantId, _ := strconv.Atoi(os.Getenv("CP_MERCHANT_ID"))
+
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
 
+	apiKey := openapiclient.APIKey{
+		Key:    openapiclient.GenerateApiKey(cpClientId, cpLicenceKey),
+		Prefix: "",
+	}
+	sandboxContext := context.WithValue(context.WithValue(
+		context.Background(),
+		openapiclient.ContextAPIKeys, map[string]openapiclient.APIKey{"cp-api-key": apiKey}),
+		openapiclient.ContextServerIndex, 1) // Use sandbox server
+
 	t.Run("Test OperationalFunctionsApiService AclCheckRequest", func(t *testing.T) {
 
-		resp, httpRes, err := apiClient.OperationalFunctionsApi.AclCheckRequest(context.Background()).Execute()
-
-		require.Nil(t, err)
-		require.NotNil(t, resp)
-		assert.Equal(t, 200, httpRes.StatusCode)
-
-	})
-
-	t.Run("Test OperationalFunctionsApiService DomainKeyCheckRequest", func(t *testing.T) {
-
-		resp, httpRes, err := apiClient.OperationalFunctionsApi.DomainKeyCheckRequest(context.Background()).Execute()
+		resp, httpRes, err := apiClient.OperationalFunctionsApi.AclCheckRequest(
+			sandboxContext).
+			AclCheckRequest(*openapiclient.NewAclCheckRequest("1.1.1.1")).
+			Execute()
 
 		require.Nil(t, err)
 		require.NotNil(t, resp)
@@ -44,7 +52,30 @@ func Test_citypay_OperationalFunctionsApiService(t *testing.T) {
 
 	t.Run("Test OperationalFunctionsApiService DomainKeyGenRequest", func(t *testing.T) {
 
-		resp, httpRes, err := apiClient.OperationalFunctionsApi.DomainKeyGenRequest(context.Background()).Execute()
+		resp, httpRes, err := apiClient.OperationalFunctionsApi.DomainKeyGenRequest(
+			sandboxContext).
+			DomainKeyRequest(*openapiclient.NewDomainKeyRequest([]string{"domain"}, int32(cpMerchantId))).
+			Execute()
+
+		require.Nil(t, err)
+		require.NotNil(t, resp)
+		assert.Equal(t, 200, httpRes.StatusCode)
+
+	})
+
+	t.Run("Test OperationalFunctionsApiService DomainKeyCheckRequest", func(t *testing.T) {
+
+		resp, _, _ := apiClient.OperationalFunctionsApi.DomainKeyGenRequest(
+			sandboxContext).
+			DomainKeyRequest(*openapiclient.NewDomainKeyRequest([]string{"domain"}, int32(cpMerchantId))).
+			Execute()
+
+		domainKey := resp.DomainKey
+
+		resp, httpRes, err := apiClient.OperationalFunctionsApi.DomainKeyCheckRequest(
+			sandboxContext).
+			DomainKeyCheckRequest(*openapiclient.NewDomainKeyCheckRequest(*domainKey)).
+			Execute()
 
 		require.Nil(t, err)
 		require.NotNil(t, resp)
@@ -54,9 +85,7 @@ func Test_citypay_OperationalFunctionsApiService(t *testing.T) {
 
 	t.Run("Test OperationalFunctionsApiService ListMerchantsRequest", func(t *testing.T) {
 
-		var clientid string
-
-		resp, httpRes, err := apiClient.OperationalFunctionsApi.ListMerchantsRequest(context.Background(), clientid).Execute()
+		resp, httpRes, err := apiClient.OperationalFunctionsApi.ListMerchantsRequest(sandboxContext, cpClientId).Execute()
 
 		require.Nil(t, err)
 		require.NotNil(t, resp)
@@ -66,7 +95,10 @@ func Test_citypay_OperationalFunctionsApiService(t *testing.T) {
 
 	t.Run("Test OperationalFunctionsApiService PingRequest", func(t *testing.T) {
 
-		resp, httpRes, err := apiClient.OperationalFunctionsApi.PingRequest(context.Background()).Execute()
+		resp, httpRes, err := apiClient.OperationalFunctionsApi.PingRequest(
+			sandboxContext).
+			Ping(*openapiclient.NewPingWithDefaults()).
+			Execute()
 
 		require.Nil(t, err)
 		require.NotNil(t, resp)

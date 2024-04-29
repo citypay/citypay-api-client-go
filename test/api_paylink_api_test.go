@@ -14,19 +14,64 @@ import (
 	openapiclient "github.com/citypay/citypay-api-client-go"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"os"
+	"strconv"
 	"testing"
+	"time"
 )
 
+func generateToken(client *openapiclient.APIClient, sandboxContext context.Context) string {
+
+	cpMerchantId, _ := strconv.Atoi(os.Getenv("CP_MERCHANT_ID"))
+
+	resp, _, _ := client.PaylinkApi.TokenCreateRequest(
+		sandboxContext).PaylinkTokenRequestModel(*openapiclient.NewPaylinkTokenRequestModel(1, generateRandomId(), int32(cpMerchantId))).
+		Execute()
+
+	return resp.Token
+}
+
 func Test_citypay_PaylinkApiService(t *testing.T) {
+
+	cpClientId := os.Getenv("CP_CLIENT_ID")
+	cpLicenceKey := os.Getenv("CP_LICENCE_KEY")
+	cpMerchantId64, _ := strconv.Atoi(os.Getenv("CP_MERCHANT_ID"))
+	cpMerchantId := int32(cpMerchantId64)
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
 
+	apiKey := openapiclient.APIKey{
+		Key:    openapiclient.GenerateApiKey(cpClientId, cpLicenceKey),
+		Prefix: "",
+	}
+	sandboxContext := context.WithValue(context.WithValue(
+		context.Background(),
+		openapiclient.ContextAPIKeys, map[string]openapiclient.APIKey{"cp-api-key": apiKey}),
+		openapiclient.ContextServerIndex, 1) // Use sandbox server
+
+	t.Run("Test PaylinkApiService TokenCreateRequest", func(t *testing.T) {
+
+		resp, httpRes, err := apiClient.PaylinkApi.TokenCreateRequest(
+			sandboxContext).PaylinkTokenRequestModel(*openapiclient.NewPaylinkTokenRequestModel(1, generateRandomId(), cpMerchantId)).
+			Execute()
+
+		require.Nil(t, err)
+		require.NotNil(t, resp)
+		assert.Equal(t, 200, httpRes.StatusCode)
+
+	})
+
 	t.Run("Test PaylinkApiService TokenAdjustmentRequest", func(t *testing.T) {
 
-		var token string
+		token := generateToken(apiClient, sandboxContext)
 
-		resp, httpRes, err := apiClient.PaylinkApi.TokenAdjustmentRequest(context.Background(), token).Execute()
+		request := openapiclient.NewPaylinkAdjustmentRequest()
+		request.SetAmount(2)
+		request.SetIdentifier("test-id")
+		request.SetReason("Test Reason")
+
+		resp, httpRes, err := apiClient.PaylinkApi.TokenAdjustmentRequest(sandboxContext, token).PaylinkAdjustmentRequest(*request).Execute()
 
 		require.Nil(t, err)
 		require.NotNil(t, resp)
@@ -36,9 +81,9 @@ func Test_citypay_PaylinkApiService(t *testing.T) {
 
 	t.Run("Test PaylinkApiService TokenCancelRequest", func(t *testing.T) {
 
-		var token string
+		token := generateToken(apiClient, sandboxContext)
 
-		resp, httpRes, err := apiClient.PaylinkApi.TokenCancelRequest(context.Background(), token).Execute()
+		resp, httpRes, err := apiClient.PaylinkApi.TokenCancelRequest(sandboxContext, token).Execute()
 
 		require.Nil(t, err)
 		require.NotNil(t, resp)
@@ -48,7 +93,12 @@ func Test_citypay_PaylinkApiService(t *testing.T) {
 
 	t.Run("Test PaylinkApiService TokenChangesRequest", func(t *testing.T) {
 
-		resp, httpRes, err := apiClient.PaylinkApi.TokenChangesRequest(context.Background()).Execute()
+		changeTime := time.Now().Add(-10 * time.Minute)
+
+		resp, httpRes, err := apiClient.PaylinkApi.
+			TokenChangesRequest(sandboxContext).
+			PaylinkTokenStatusChangeRequest(*openapiclient.NewPaylinkTokenStatusChangeRequest(changeTime, cpMerchantId)).
+			Execute()
 
 		require.Nil(t, err)
 		require.NotNil(t, resp)
@@ -58,9 +108,9 @@ func Test_citypay_PaylinkApiService(t *testing.T) {
 
 	t.Run("Test PaylinkApiService TokenCloseRequest", func(t *testing.T) {
 
-		var token string
+		token := generateToken(apiClient, sandboxContext)
 
-		resp, httpRes, err := apiClient.PaylinkApi.TokenCloseRequest(context.Background(), token).Execute()
+		resp, httpRes, err := apiClient.PaylinkApi.TokenCloseRequest(sandboxContext, token).Execute()
 
 		require.Nil(t, err)
 		require.NotNil(t, resp)
@@ -70,17 +120,24 @@ func Test_citypay_PaylinkApiService(t *testing.T) {
 
 	t.Run("Test PaylinkApiService TokenCreateBillPaymentRequest", func(t *testing.T) {
 
-		resp, httpRes, err := apiClient.PaylinkApi.TokenCreateBillPaymentRequest(context.Background()).Execute()
+		fieldGuardModel := openapiclient.NewPaylinkFieldGuardModel()
+		fieldGuardModel.SetLabel("label")
+		fieldGuardModel.SetFieldType("type")
+		fieldGuardModel.SetName("name")
+		fieldGuardModel.SetValue("value")
+		fieldGuardModel.SetRegex("regex")
 
-		require.Nil(t, err)
-		require.NotNil(t, resp)
-		assert.Equal(t, 200, httpRes.StatusCode)
+		configModel := openapiclient.NewPaylinkConfig()
+		configModel.SetFieldGuard([]openapiclient.PaylinkFieldGuardModel{*fieldGuardModel})
 
-	})
+		tokenModel := openapiclient.NewPaylinkTokenRequestModel(1, generateRandomId(), cpMerchantId)
+		tokenModel.SetConfig(*configModel)
 
-	t.Run("Test PaylinkApiService TokenCreateRequest", func(t *testing.T) {
+		model := openapiclient.NewPaylinkBillPaymentTokenRequest(*tokenModel)
 
-		resp, httpRes, err := apiClient.PaylinkApi.TokenCreateRequest(context.Background()).Execute()
+		resp, httpRes, err := apiClient.PaylinkApi.
+			TokenCreateBillPaymentRequest(sandboxContext).
+			PaylinkBillPaymentTokenRequest(*model).Execute()
 
 		require.Nil(t, err)
 		require.NotNil(t, resp)
@@ -90,9 +147,9 @@ func Test_citypay_PaylinkApiService(t *testing.T) {
 
 	t.Run("Test PaylinkApiService TokenPurgeAttachmentsRequest", func(t *testing.T) {
 
-		var token string
+		token := generateToken(apiClient, sandboxContext)
 
-		resp, httpRes, err := apiClient.PaylinkApi.TokenPurgeAttachmentsRequest(context.Background(), token).Execute()
+		resp, httpRes, err := apiClient.PaylinkApi.TokenPurgeAttachmentsRequest(sandboxContext, token).Execute()
 
 		require.Nil(t, err)
 		require.NotNil(t, resp)
@@ -102,9 +159,9 @@ func Test_citypay_PaylinkApiService(t *testing.T) {
 
 	t.Run("Test PaylinkApiService TokenReconciledRequest", func(t *testing.T) {
 
-		var token string
+		token := generateToken(apiClient, sandboxContext)
 
-		resp, httpRes, err := apiClient.PaylinkApi.TokenReconciledRequest(context.Background(), token).Execute()
+		resp, httpRes, err := apiClient.PaylinkApi.TokenReconciledRequest(sandboxContext, token).Execute()
 
 		require.Nil(t, err)
 		require.NotNil(t, resp)
@@ -114,9 +171,9 @@ func Test_citypay_PaylinkApiService(t *testing.T) {
 
 	t.Run("Test PaylinkApiService TokenReopenRequest", func(t *testing.T) {
 
-		var token string
+		token := generateToken(apiClient, sandboxContext)
 
-		resp, httpRes, err := apiClient.PaylinkApi.TokenReopenRequest(context.Background(), token).Execute()
+		resp, httpRes, err := apiClient.PaylinkApi.TokenReopenRequest(sandboxContext, token).Execute()
 
 		require.Nil(t, err)
 		require.NotNil(t, resp)
@@ -126,9 +183,12 @@ func Test_citypay_PaylinkApiService(t *testing.T) {
 
 	t.Run("Test PaylinkApiService TokenResendNotificationRequest", func(t *testing.T) {
 
-		var token string
+		token := generateToken(apiClient, sandboxContext)
 
-		resp, httpRes, err := apiClient.PaylinkApi.TokenResendNotificationRequest(context.Background(), token).Execute()
+		resp, httpRes, err := apiClient.PaylinkApi.
+			TokenResendNotificationRequest(sandboxContext, token).
+			PaylinkResendNotificationRequest(*openapiclient.NewPaylinkResendNotificationRequestWithDefaults()).
+			Execute()
 
 		require.Nil(t, err)
 		require.NotNil(t, resp)
@@ -138,9 +198,9 @@ func Test_citypay_PaylinkApiService(t *testing.T) {
 
 	t.Run("Test PaylinkApiService TokenStatusRequest", func(t *testing.T) {
 
-		var token string
+		token := generateToken(apiClient, sandboxContext)
 
-		resp, httpRes, err := apiClient.PaylinkApi.TokenStatusRequest(context.Background(), token).Execute()
+		resp, httpRes, err := apiClient.PaylinkApi.TokenStatusRequest(sandboxContext, token).Execute()
 
 		require.Nil(t, err)
 		require.NotNil(t, resp)

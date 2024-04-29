@@ -14,20 +14,37 @@ import (
 	openapiclient "github.com/citypay/citypay-api-client-go"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"os"
+	"strconv"
 	"testing"
+	"time"
 )
 
 func Test_citypay_ReportingApiService(t *testing.T) {
 
+	cpClientId := os.Getenv("CP_CLIENT_ID")
+	cpLicenceKey := os.Getenv("CP_LICENCE_KEY")
+	cpMerchantId64, _ := strconv.Atoi(os.Getenv("CP_MERCHANT_ID"))
+	cpMerchantId := int32(cpMerchantId64)
+
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
 
+	apiKey := openapiclient.APIKey{
+		Key:    openapiclient.GenerateApiKey(cpClientId, cpLicenceKey),
+		Prefix: "",
+	}
+	sandboxContext := context.WithValue(context.WithValue(
+		context.Background(),
+		openapiclient.ContextAPIKeys, map[string]openapiclient.APIKey{"cp-api-key": apiKey}),
+		openapiclient.ContextServerIndex, 1) // Use sandbox server
+
 	t.Run("Test ReportingApiService BatchedTransactionReportRequest", func(t *testing.T) {
 
-		var merchantid int32
-		var batchNo string
-
-		resp, httpRes, err := apiClient.ReportingApi.BatchedTransactionReportRequest(context.Background(), merchantid, batchNo).Execute()
+		resp, httpRes, err := apiClient.ReportingApi.
+			BatchedTransactionReportRequest(sandboxContext, cpMerchantId, "1").
+			BatchTransactionReportRequest(*openapiclient.NewBatchTransactionReportRequest()).
+			Execute()
 
 		require.Nil(t, err)
 		require.NotNil(t, resp)
@@ -37,7 +54,18 @@ func Test_citypay_ReportingApiService(t *testing.T) {
 
 	t.Run("Test ReportingApiService MerchantBatchReportRequest", func(t *testing.T) {
 
-		resp, httpRes, err := apiClient.ReportingApi.MerchantBatchReportRequest(context.Background()).Execute()
+		model := openapiclient.NewMerchantBatchReportRequest()
+		model.SetDateFrom(time.Now().AddDate(-1, 0, 0).Format(time.DateOnly))
+		model.SetDateUntil(time.Now().Format(time.DateOnly))
+		model.SetMaxResults(2)
+		model.SetMerchantId([]int32{cpMerchantId})
+		model.SetNextToken("next-token")
+		model.SetOrderBy("order")
+
+		resp, httpRes, err := apiClient.ReportingApi.
+			MerchantBatchReportRequest(sandboxContext).
+			MerchantBatchReportRequest(*openapiclient.NewMerchantBatchReportRequest()).
+			Execute()
 
 		require.Nil(t, err)
 		require.NotNil(t, resp)
@@ -47,10 +75,7 @@ func Test_citypay_ReportingApiService(t *testing.T) {
 
 	t.Run("Test ReportingApiService MerchantBatchRequest", func(t *testing.T) {
 
-		var merchantid int32
-		var batchNo string
-
-		resp, httpRes, err := apiClient.ReportingApi.MerchantBatchRequest(context.Background(), merchantid, batchNo).Execute()
+		resp, httpRes, err := apiClient.ReportingApi.MerchantBatchRequest(sandboxContext, cpMerchantId, "1").Execute()
 
 		require.Nil(t, err)
 		require.NotNil(t, resp)
@@ -60,9 +85,7 @@ func Test_citypay_ReportingApiService(t *testing.T) {
 
 	t.Run("Test ReportingApiService RemittanceRangeReport", func(t *testing.T) {
 
-		var clientid string
-
-		resp, httpRes, err := apiClient.ReportingApi.RemittanceRangeReport(context.Background(), clientid).Execute()
+		resp, httpRes, err := apiClient.ReportingApi.RemittanceRangeReport(sandboxContext, cpClientId).Execute()
 
 		require.Nil(t, err)
 		require.NotNil(t, resp)
@@ -72,10 +95,9 @@ func Test_citypay_ReportingApiService(t *testing.T) {
 
 	t.Run("Test ReportingApiService RemittanceReportRequest", func(t *testing.T) {
 
-		var clientid string
 		var date string
 
-		resp, httpRes, err := apiClient.ReportingApi.RemittanceReportRequest(context.Background(), clientid, date).Execute()
+		resp, httpRes, err := apiClient.ReportingApi.RemittanceReportRequest(sandboxContext, cpClientId, date).Execute()
 
 		require.Nil(t, err)
 		require.NotNil(t, resp)
