@@ -130,10 +130,13 @@ func Test_citypay_PaylinkApiService(t *testing.T) {
 		configModel := openapiclient.NewPaylinkConfig()
 		configModel.SetFieldGuard([]openapiclient.PaylinkFieldGuardModel{*fieldGuardModel})
 
+		attachmentModel := openapiclient.NewPaylinkAttachmentRequest("filename", "application/pdf")
+
 		tokenModel := openapiclient.NewPaylinkTokenRequestModel(1, generateRandomId(), cpMerchantId)
 		tokenModel.SetConfig(*configModel)
 
 		model := openapiclient.NewPaylinkBillPaymentTokenRequest(*tokenModel)
+		model.SetAttachments([]openapiclient.PaylinkAttachmentRequest{*attachmentModel})
 
 		resp, httpRes, err := apiClient.PaylinkApi.
 			TokenCreateBillPaymentRequest(sandboxContext).
