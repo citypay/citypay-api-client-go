@@ -1,0 +1,32 @@
+name: Go Tests
+
+#on:
+#  push:
+#    branches: [ main ]
+#  pull_request:
+#    branches: [ main ]
+on:
+  push:
+    branches: [ '*' ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      CP_CLIENT_ID: ${{ secrets.CP_CLIENT_ID }}
+      CP_LICENCE_KEY: ${{ secrets.CP_LICENCE_KEY }}
+      CP_MERCHANT_ID: ${{ secrets.CP_MERCHANT_ID }}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Build
+        run: go build -v ./...
+
+      - name: Test
+        run: go test test
