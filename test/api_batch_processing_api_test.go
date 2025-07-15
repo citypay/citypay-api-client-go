@@ -40,13 +40,14 @@ func Test_citypay_BatchProcessingApiService(t *testing.T) {
 
 	t.Run("Test BatchProcessingApiService BatchProcessRequest", func(t *testing.T) {
 
-		account, _, _ := createAccount(apiClient, sandboxContext)
+		//account, _, _ := createAccount(apiClient, sandboxContext)
 
-		transactions := []openapiclient.BatchTransaction{*openapiclient.NewBatchTransaction(account.GetAccountId(), 1)}
+		//transactions := []openapiclient.BatchTransaction{*openapiclient.NewBatchTransaction(account.GetAccountId(), 1)}
+		transactions := []openapiclient.BatchTransaction{}
 
 		resp, httpRes, err := apiClient.BatchProcessingApi.
 			BatchProcessRequest(sandboxContext).
-			ProcessBatchRequest(*openapiclient.NewProcessBatchRequest(time.Now().Format(time.RFC3339), 1, transactions)).
+			ProcessBatchRequest(*openapiclient.NewProcessBatchRequest(time.Now().Format(time.RFC3339), 2, transactions)).
 			Execute()
 
 		require.Nil(t, err)
@@ -57,7 +58,9 @@ func Test_citypay_BatchProcessingApiService(t *testing.T) {
 
 	t.Run("Test BatchProcessingApiService BatchRetrieveRequest", func(t *testing.T) {
 
-		resp, httpRes, err := apiClient.BatchProcessingApi.BatchRetrieveRequest(sandboxContext).Execute()
+		account, _, _ := createAccount(apiClient, sandboxContext)
+
+		resp, httpRes, err := apiClient.BatchProcessingApi.BatchRetrieveRequest(sandboxContext).BatchReportRequest(openapiclient.BatchReportRequest{BatchId: 1, ClientAccountId: &account.AccountId}).Execute()
 
 		require.Nil(t, err)
 		require.NotNil(t, resp)
