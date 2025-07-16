@@ -19,14 +19,14 @@ var exampleMBRMax int32 = 10
 var exampleMBRToken = "tok"
 var exampleMBRTime = time.Date(2024, time.January, 1, 0, 0, 0, 0, time.UTC)
 
-func buildExampleNetSummary() openapiclient.NetSummaryResponse {
+func buildMBReportNetSummary() openapiclient.NetSummaryResponse {
 	n := openapiclient.NewNetSummaryResponse()
 	val := int32(100)
 	n.SetNetAmount(val)
 	return *n
 }
 
-func buildExampleMerchantBatchResponse() openapiclient.MerchantBatchResponse {
+func buildMBReportMerchantBatchResponse() openapiclient.MerchantBatchResponse {
 	m := openapiclient.NewMerchantBatchResponse()
 	m.SetBatchClosed(exampleMBRTime)
 	m.SetBatchNo(exampleMBRBatchNo)
@@ -34,13 +34,13 @@ func buildExampleMerchantBatchResponse() openapiclient.MerchantBatchResponse {
 	m.SetBatchStatusCode(exampleMBRCode)
 	m.SetCurrency(exampleMBRCurrency)
 	m.SetMerchantid(exampleMBRMerchantID)
-	summary := buildExampleNetSummary()
+	summary := buildMBReportNetSummary()
 	m.SetNetSummary(summary)
 	return *m
 }
 
 func buildExampleMerchantBatchReportResponse() openapiclient.MerchantBatchReportResponse {
-	m := openapiclient.NewMerchantBatchReportResponse([]openapiclient.MerchantBatchResponse{buildExampleMerchantBatchResponse()})
+	m := openapiclient.NewMerchantBatchReportResponse([]openapiclient.MerchantBatchResponse{buildMBReportMerchantBatchResponse()})
 	m.SetCount(exampleMBRCount)
 	m.SetMaxResults(exampleMBRMax)
 	m.SetNextToken(exampleMBRToken)
@@ -48,7 +48,7 @@ func buildExampleMerchantBatchReportResponse() openapiclient.MerchantBatchReport
 }
 
 func TestNewMerchantBatchReportResponse(t *testing.T) {
-	model := openapiclient.NewMerchantBatchReportResponse([]openapiclient.MerchantBatchResponse{buildExampleMerchantBatchResponse()})
+	model := openapiclient.NewMerchantBatchReportResponse([]openapiclient.MerchantBatchResponse{buildMBReportMerchantBatchResponse()})
 	require.NotNil(t, model)
 	assert.Equal(t, 1, len(model.GetBatches()))
 	assert.False(t, model.HasCount())
@@ -63,7 +63,7 @@ func TestNewMerchantBatchReportResponseWithDefaults(t *testing.T) {
 }
 
 func TestMerchantBatchReportResponseSetGetCycle(t *testing.T) {
-	model := openapiclient.NewMerchantBatchReportResponse([]openapiclient.MerchantBatchResponse{buildExampleMerchantBatchResponse()})
+	model := openapiclient.NewMerchantBatchReportResponse([]openapiclient.MerchantBatchResponse{buildMBReportMerchantBatchResponse()})
 	model.SetCount(exampleMBRCount)
 	assert.True(t, model.HasCount())
 	assert.Equal(t, exampleMBRCount, model.GetCount())

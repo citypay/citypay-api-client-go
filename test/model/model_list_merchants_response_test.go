@@ -11,7 +11,7 @@ import (
 var exampleListClientName = "ExampleClient"
 var exampleListClientID = "cli123"
 
-func buildExampleMerchant() openapiclient.Merchant {
+func buildListMerchantsMerchant() openapiclient.Merchant {
 	m := openapiclient.NewMerchant()
 	m.SetName("Shop")
 	m.SetMerchantid(99)
@@ -22,7 +22,7 @@ func buildExampleListResponse() openapiclient.ListMerchantsResponse {
 	l := openapiclient.NewListMerchantsResponse()
 	l.SetClientName(exampleListClientName)
 	l.SetClientid(exampleListClientID)
-	l.SetMerchants([]openapiclient.Merchant{buildExampleMerchant()})
+	l.SetMerchants([]openapiclient.Merchant{buildListMerchantsMerchant()})
 	return *l
 }
 
@@ -55,7 +55,7 @@ func TestListMerchantsResponseSetGetCycle(t *testing.T) {
 	assert.True(t, model.HasClientid())
 	assert.Equal(t, exampleListClientID, model.GetClientid())
 
-	mer := buildExampleMerchant()
+	mer := buildListMerchantsMerchant()
 	model.SetMerchants([]openapiclient.Merchant{mer})
 	assert.True(t, model.HasMerchants())
 	assert.Equal(t, 1, len(model.GetMerchants()))

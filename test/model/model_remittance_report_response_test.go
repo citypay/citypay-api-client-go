@@ -13,26 +13,26 @@ var exampleRemitRespCount int32 = 2
 var exampleRemitRespMax int32 = 10
 var exampleRemitRespNext = "next"
 
-func buildExampleMerchantBatchResponse() openapiclient.MerchantBatchResponse {
+func buildRRMerchantBatchResponse() openapiclient.MerchantBatchResponse {
 	m := openapiclient.NewMerchantBatchResponse()
 	m.SetBatchId(1)
 	return *m
 }
 
-func buildExampleRemittanceDataSlice() []openapiclient.RemittanceData {
+func buildRRRemittanceDataSlice() []openapiclient.RemittanceData {
 	r := openapiclient.NewRemittanceData()
 	r.SetDateCreated(time.Now())
 	return []openapiclient.RemittanceData{*r}
 }
 
-func buildExampleRemittedClientData() openapiclient.RemittedClientData {
-	d := openapiclient.NewRemittedClientData([]openapiclient.MerchantBatchResponse{buildExampleMerchantBatchResponse()}, buildExampleRemittanceDataSlice())
+func buildRRRemittedClientData() openapiclient.RemittedClientData {
+	d := openapiclient.NewRemittedClientData([]openapiclient.MerchantBatchResponse{buildRRMerchantBatchResponse()}, buildRRRemittanceDataSlice())
 	d.SetClientid("c1")
 	return *d
 }
 
 func buildExampleRemittanceReportResponse() openapiclient.RemittanceReportResponse {
-	r := openapiclient.NewRemittanceReportResponse([]openapiclient.RemittedClientData{buildExampleRemittedClientData()})
+	r := openapiclient.NewRemittanceReportResponse([]openapiclient.RemittedClientData{buildRRRemittedClientData()})
 	r.SetCount(exampleRemitRespCount)
 	r.SetMaxResults(exampleRemitRespMax)
 	r.SetNextToken(exampleRemitRespNext)

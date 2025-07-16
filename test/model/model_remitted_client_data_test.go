@@ -13,7 +13,7 @@ var exampleRemittedClientID = "cid"
 var exampleRemittedDate = "2024-01-02"
 var exampleRemittedNet int32 = 50
 
-func buildExampleMerchantBatchResponse() openapiclient.MerchantBatchResponse {
+func buildRCDMerchantBatchResponse() openapiclient.MerchantBatchResponse {
 	m := openapiclient.NewMerchantBatchResponse()
 	m.SetBatchId(1)
 	return *m
@@ -26,7 +26,7 @@ func buildExampleRemittanceDataSlice() []openapiclient.RemittanceData {
 }
 
 func buildExampleRemittedClientData() openapiclient.RemittedClientData {
-	d := openapiclient.NewRemittedClientData([]openapiclient.MerchantBatchResponse{buildExampleMerchantBatchResponse()}, buildExampleRemittanceDataSlice())
+	d := openapiclient.NewRemittedClientData([]openapiclient.MerchantBatchResponse{buildRCDMerchantBatchResponse()}, buildExampleRemittanceDataSlice())
 	d.SetClientid(exampleRemittedClientID)
 	d.SetDate(&exampleRemittedDate)
 	d.SetNetAmount(exampleRemittedNet)

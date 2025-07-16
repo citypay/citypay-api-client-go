@@ -12,7 +12,7 @@ var exampleProcessDate = "2024-01-01"
 var exampleProcessID int32 = 7
 var exampleProcessClient = "cli"
 
-func buildExampleBatchTransaction() openapiclient.BatchTransaction {
+func buildProcessBatchTransaction() openapiclient.BatchTransaction {
 	b := openapiclient.NewBatchTransaction("acc", 10)
 	b.SetIdentifier("id")
 	b.SetMerchantid(1)
@@ -20,7 +20,7 @@ func buildExampleBatchTransaction() openapiclient.BatchTransaction {
 }
 
 func buildExampleProcessBatchRequest() openapiclient.ProcessBatchRequest {
-	p := openapiclient.NewProcessBatchRequest(exampleProcessDate, exampleProcessID, []openapiclient.BatchTransaction{buildExampleBatchTransaction()})
+	p := openapiclient.NewProcessBatchRequest(exampleProcessDate, exampleProcessID, []openapiclient.BatchTransaction{buildProcessBatchTransaction()})
 	p.SetClientAccountId(exampleProcessClient)
 	return *p
 }
@@ -45,7 +45,7 @@ func TestProcessBatchRequestSetGetCycle(t *testing.T) {
 	assert.True(t, model.HasClientAccountId())
 	assert.Equal(t, exampleProcessClient, model.GetClientAccountId())
 
-	tx := buildExampleBatchTransaction()
+	tx := buildProcessBatchTransaction()
 	model.SetTransactions([]openapiclient.BatchTransaction{tx})
 	assert.Len(t, model.GetTransactions(), 1)
 }

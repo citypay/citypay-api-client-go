@@ -28,7 +28,7 @@ var exampleDPTag = []string{"one", "two"}
 var exampleDPTransInfo = "info"
 var exampleDPTransType = "SALE"
 
-func buildExampleContact() openapiclient.ContactDetails {
+func buildDirectPostContact() openapiclient.ContactDetails {
 	c := openapiclient.NewContactDetails()
 	c.SetAddress1("addr")
 	c.SetEmail("c@example.com")
@@ -44,7 +44,7 @@ func buildExampleThreeDS() openapiclient.ThreeDSecure {
 func buildExampleDirectPostRequest() *openapiclient.DirectPostRequest {
 	d := openapiclient.NewDirectPostRequest(exampleDPAmount, exampleDPCard, exampleDPExpMonth, exampleDPExpYear, exampleDPIdentifier, exampleDPMac)
 	d.SetAvsPostcodePolicy(exampleDPAvsPolicy)
-	d.SetBillTo(buildExampleContact())
+	d.SetBillTo(buildDirectPostContact())
 	d.SetCsc(exampleDPCsc)
 	d.SetCscPolicy(exampleDPCscPolicy)
 	d.SetCurrency(exampleDPCurrency)
@@ -54,7 +54,7 @@ func buildExampleDirectPostRequest() *openapiclient.DirectPostRequest {
 	d.SetNonce(exampleDPNonce)
 	d.SetRedirectFailure(exampleDPRedirectFail)
 	d.SetRedirectSuccess(exampleDPRedirectSuccess)
-	d.SetShipTo(buildExampleContact())
+	d.SetShipTo(buildDirectPostContact())
 	d.SetTag(exampleDPTag)
 	d.SetThreedsecure(buildExampleThreeDS())
 	d.SetTransInfo(exampleDPTransInfo)
@@ -83,7 +83,7 @@ func TestDirectPostRequestSetGetCycle(t *testing.T) {
 	assert.True(t, model.HasAvsPostcodePolicy())
 	assert.Equal(t, exampleDPAvsPolicy, model.GetAvsPostcodePolicy())
 
-	ct := buildExampleContact()
+	ct := buildDirectPostContact()
 	model.SetBillTo(ct)
 	assert.True(t, model.HasBillTo())
 	assert.Equal(t, ct, model.GetBillTo())
@@ -124,7 +124,7 @@ func TestDirectPostRequestSetGetCycle(t *testing.T) {
 	assert.True(t, model.HasRedirectSuccess())
 	assert.Equal(t, exampleDPRedirectSuccess, model.GetRedirectSuccess())
 
-	ship := buildExampleContact()
+	ship := buildDirectPostContact()
 	model.SetShipTo(ship)
 	assert.True(t, model.HasShipTo())
 	assert.Equal(t, ship, model.GetShipTo())

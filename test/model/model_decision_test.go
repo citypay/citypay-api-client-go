@@ -18,7 +18,7 @@ var exampleAuthResult int32 = 1
 var exampleAuthCode = "A"
 var exampleAuthMsg = "Approved"
 
-func buildExampleRequestChallenged() openapiclient.RequestChallenged {
+func buildDecisionRequestChallenged() openapiclient.RequestChallenged {
 	r := openapiclient.NewRequestChallenged()
 	r.SetAcsUrl(exampleAcsURL)
 	r.SetCreq(exampleCreq)
@@ -37,7 +37,7 @@ func buildExampleAuthResp() openapiclient.AuthResponse {
 func buildExampleDecision() *openapiclient.Decision {
 	d := openapiclient.NewDecision()
 	d.SetAuthResponse(buildExampleAuthResp())
-	d.SetRequestChallenged(buildExampleRequestChallenged())
+	d.SetRequestChallenged(buildDecisionRequestChallenged())
 	return d
 }
 
@@ -64,7 +64,7 @@ func TestDecisionSetGetCycle(t *testing.T) {
 		assert.Equal(t, ar, *val)
 	}
 
-	rc := buildExampleRequestChallenged()
+	rc := buildDecisionRequestChallenged()
 	model.SetRequestChallenged(rc)
 	assert.True(t, model.HasRequestChallenged())
 	assert.Equal(t, rc, model.GetRequestChallenged())

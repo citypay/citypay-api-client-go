@@ -20,7 +20,7 @@ var exampleIntentTransInfo = "info"
 var exampleIntentTransType = "SALE"
 var exampleIntentTag = []string{"t1", "t2"}
 
-func buildExampleContact() openapiclient.ContactDetails {
+func buildIntentContact() openapiclient.ContactDetails {
 	c := openapiclient.NewContactDetails()
 	c.SetAddress1("street")
 	c.SetEmail("x@example.com")
@@ -30,13 +30,13 @@ func buildExampleContact() openapiclient.ContactDetails {
 func buildExamplePaymentIntent() openapiclient.PaymentIntent {
 	p := openapiclient.NewPaymentIntent(exampleIntentAmount, exampleIntentIdentifier)
 	p.SetAvsPostcodePolicy(exampleIntentAvsPolicy)
-	p.SetBillTo(buildExampleContact())
+	p.SetBillTo(buildIntentContact())
 	p.SetCsc(exampleIntentCsc)
 	p.SetCscPolicy(exampleIntentCscPolicy)
 	p.SetCurrency(exampleIntentCurrency)
 	p.SetDuplicatePolicy(exampleIntentDupPolicy)
 	p.SetMatchAvsa(exampleIntentMatchAvsa)
-	p.SetShipTo(buildExampleContact())
+	p.SetShipTo(buildIntentContact())
 	p.SetTag(exampleIntentTag)
 	p.SetTransInfo(exampleIntentTransInfo)
 	p.SetTransType(exampleIntentTransType)
@@ -64,7 +64,7 @@ func TestPaymentIntentSetGetCycle(t *testing.T) {
 	assert.True(t, model.HasAvsPostcodePolicy())
 	assert.Equal(t, exampleIntentAvsPolicy, model.GetAvsPostcodePolicy())
 
-	ct := buildExampleContact()
+	ct := buildIntentContact()
 	model.SetBillTo(ct)
 	assert.True(t, model.HasBillTo())
 	assert.Equal(t, ct, model.GetBillTo())
@@ -89,7 +89,7 @@ func TestPaymentIntentSetGetCycle(t *testing.T) {
 	assert.True(t, model.HasMatchAvsa())
 	assert.Equal(t, exampleIntentMatchAvsa, model.GetMatchAvsa())
 
-	ship := buildExampleContact()
+	ship := buildIntentContact()
 	model.SetShipTo(ship)
 	assert.True(t, model.HasShipTo())
 	assert.Equal(t, ship, model.GetShipTo())
