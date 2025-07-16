@@ -10,19 +10,19 @@ import (
 
 var exampleDomain = []string{"example.com"}
 var exampleLive = true
-var exampleMerchantID int32 = 50
+var exampleDomainMerchantID int32 = 50
 
 func buildExampleDomainKeyRequest() *openapiclient.DomainKeyRequest {
-	d := openapiclient.NewDomainKeyRequest(exampleDomain, exampleMerchantID)
+	d := openapiclient.NewDomainKeyRequest(exampleDomain, exampleDomainMerchantID)
 	d.SetLive(exampleLive)
 	return d
 }
 
 func TestNewDomainKeyRequest(t *testing.T) {
-	model := openapiclient.NewDomainKeyRequest(exampleDomain, exampleMerchantID)
+	model := openapiclient.NewDomainKeyRequest(exampleDomain, exampleDomainMerchantID)
 	require.NotNil(t, model)
 	assert.Equal(t, exampleDomain, model.GetDomain())
-	assert.Equal(t, exampleMerchantID, model.GetMerchantid())
+	assert.Equal(t, exampleDomainMerchantID, model.GetMerchantid())
 	assert.False(t, model.HasLive())
 }
 
@@ -34,7 +34,7 @@ func TestNewDomainKeyRequestWithDefaults(t *testing.T) {
 }
 
 func TestDomainKeyRequestSetGetCycle(t *testing.T) {
-	model := openapiclient.NewDomainKeyRequest(exampleDomain, exampleMerchantID)
+	model := openapiclient.NewDomainKeyRequest(exampleDomain, exampleDomainMerchantID)
 	model.SetDomain([]string{"new.com"})
 	assert.Equal(t, []string{"new.com"}, model.GetDomain())
 
@@ -57,7 +57,7 @@ func TestDomainKeyRequestJSONRoundTrip(t *testing.T) {
 	var unmarshalled openapiclient.DomainKeyRequest
 	err = json.Unmarshal(data, &unmarshalled)
 	require.NoError(t, err)
-	assert.Equal(t, exampleMerchantID, unmarshalled.GetMerchantid())
+	assert.Equal(t, exampleDomainMerchantID, unmarshalled.GetMerchantid())
 	assert.True(t, unmarshalled.HasLive())
 }
 
@@ -101,6 +101,6 @@ func TestNullableDomainKeyRequestJSONRoundTrip(t *testing.T) {
 	require.NoError(t, err)
 	assert.True(t, newN.IsSet())
 	if assert.NotNil(t, newN.Get()) {
-		assert.Equal(t, exampleMerchantID, newN.Get().GetMerchantid())
+		assert.Equal(t, exampleDomainMerchantID, newN.Get().GetMerchantid())
 	}
 }

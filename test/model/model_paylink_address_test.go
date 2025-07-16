@@ -11,20 +11,20 @@ import (
 var exampleAddr1 = "1 Road"
 var exampleAddr2 = "Suite 2"
 var exampleAddr3 = "Floor 3"
-var exampleArea = "City"
-var exampleCountry = "GB"
+var examplePlAddrArea = "City"
+var examplePlAddrCountry = "GB"
 var exampleLabel = "Home"
-var examplePostcode = "AB12"
+var examplePlAddrPostcode = "AB12"
 
 func buildExamplePaylinkAddress() openapiclient.PaylinkAddress {
 	p := openapiclient.NewPaylinkAddress()
 	p.SetAddress1(exampleAddr1)
 	p.SetAddress2(exampleAddr2)
 	p.SetAddress3(exampleAddr3)
-	p.SetArea(exampleArea)
-	p.SetCountry(exampleCountry)
+	p.SetArea(examplePlAddrArea)
+	p.SetCountry(examplePlAddrCountry)
 	p.SetLabel(exampleLabel)
-	p.SetPostcode(examplePostcode)
+	p.SetPostcode(examplePlAddrPostcode)
 	return *p
 }
 
@@ -69,21 +69,21 @@ func TestPaylinkAddressSetGetCycle(t *testing.T) {
 	assert.True(t, model.HasAddress3())
 	assert.Equal(t, exampleAddr3, model.GetAddress3())
 
-	model.SetArea(exampleArea)
+	model.SetArea(examplePlAddrArea)
 	assert.True(t, model.HasArea())
-	assert.Equal(t, exampleArea, model.GetArea())
+	assert.Equal(t, examplePlAddrArea, model.GetArea())
 
-	model.SetCountry(exampleCountry)
+	model.SetCountry(examplePlAddrCountry)
 	assert.True(t, model.HasCountry())
-	assert.Equal(t, exampleCountry, model.GetCountry())
+	assert.Equal(t, examplePlAddrCountry, model.GetCountry())
 
 	model.SetLabel(exampleLabel)
 	assert.True(t, model.HasLabel())
 	assert.Equal(t, exampleLabel, model.GetLabel())
 
-	model.SetPostcode(examplePostcode)
+	model.SetPostcode(examplePlAddrPostcode)
 	assert.True(t, model.HasPostcode())
-	assert.Equal(t, examplePostcode, model.GetPostcode())
+	assert.Equal(t, examplePlAddrPostcode, model.GetPostcode())
 }
 
 func TestPaylinkAddressJSONRoundTrip(t *testing.T) {
@@ -112,16 +112,16 @@ func TestPaylinkAddressToMap(t *testing.T) {
 		assert.Equal(t, &exampleAddr3, m["address3"])
 	}
 	if assert.Contains(t, m, "area") {
-		assert.Equal(t, &exampleArea, m["area"])
+		assert.Equal(t, &examplePlAddrArea, m["area"])
 	}
 	if assert.Contains(t, m, "country") {
-		assert.Equal(t, &exampleCountry, m["country"])
+		assert.Equal(t, &examplePlAddrCountry, m["country"])
 	}
 	if assert.Contains(t, m, "label") {
 		assert.Equal(t, &exampleLabel, m["label"])
 	}
 	if assert.Contains(t, m, "postcode") {
-		assert.Equal(t, &examplePostcode, m["postcode"])
+		assert.Equal(t, &examplePlAddrPostcode, m["postcode"])
 	}
 }
 
@@ -153,6 +153,6 @@ func TestNullablePaylinkAddressJSONRoundTrip(t *testing.T) {
 	require.NoError(t, err)
 	assert.True(t, newN.IsSet())
 	if assert.NotNil(t, newN.Get()) {
-		assert.Equal(t, examplePostcode, newN.Get().GetPostcode())
+		assert.Equal(t, examplePlAddrPostcode, newN.Get().GetPostcode())
 	}
 }

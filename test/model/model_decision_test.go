@@ -10,7 +10,7 @@ import (
 
 var exampleAcsURL = "https://acs.example.com"
 var exampleCreq = "creqdata"
-var exampleMerchantID int32 = 100
+var exampleDecisionMerchantID int32 = 100
 var exampleThreeDSID = "threedid"
 var exampleTransno int32 = 5
 var exampleAuthMerchant int32 = 321
@@ -22,7 +22,7 @@ func buildExampleRequestChallenged() openapiclient.RequestChallenged {
 	r := openapiclient.NewRequestChallenged()
 	r.SetAcsUrl(exampleAcsURL)
 	r.SetCreq(exampleCreq)
-	r.SetMerchantid(exampleMerchantID)
+	r.SetMerchantid(exampleDecisionMerchantID)
 	r.SetThreedserverTransId(exampleThreeDSID)
 	r.SetTransno(exampleTransno)
 	return *r
