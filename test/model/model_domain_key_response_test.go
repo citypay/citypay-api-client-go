@@ -12,14 +12,14 @@ import (
 var exampleRespDomain = []string{"example.com"}
 var exampleRespDate = time.Date(2023, time.January, 1, 0, 0, 0, 0, time.UTC)
 var exampleRespDomainKey = "KEY"
-var exampleRespLive = true
+var exampleDomainRespLive = true
 var exampleRespMerchant int32 = 55
 
 func buildExampleDomainKeyResponse() *openapiclient.DomainKeyResponse {
 	d := openapiclient.NewDomainKeyResponse(exampleRespDomain, exampleRespMerchant)
 	d.SetDateCreated(exampleRespDate)
 	d.SetDomainKey(exampleRespDomainKey)
-	d.SetLive(exampleRespLive)
+	d.SetLive(exampleDomainRespLive)
 	return d
 }
 
@@ -51,9 +51,9 @@ func TestDomainKeyResponseSetGetCycle(t *testing.T) {
 	assert.True(t, model.HasDomainKey())
 	assert.Equal(t, exampleRespDomainKey, model.GetDomainKey())
 
-	model.SetLive(exampleRespLive)
+	model.SetLive(exampleDomainRespLive)
 	assert.True(t, model.HasLive())
-	assert.Equal(t, exampleRespLive, model.GetLive())
+	assert.Equal(t, exampleDomainRespLive, model.GetLive())
 
 	model.SetMerchantid(99)
 	assert.Equal(t, int32(99), model.GetMerchantid())
@@ -79,7 +79,7 @@ func TestDomainKeyResponseToMap(t *testing.T) {
 		assert.Equal(t, &exampleRespDomainKey, m["domain_key"])
 	}
 	if assert.Contains(t, m, "live") {
-		assert.Equal(t, &exampleRespLive, m["live"])
+		assert.Equal(t, &exampleDomainRespLive, m["live"])
 	}
 }
 

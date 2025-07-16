@@ -9,7 +9,7 @@ import (
 )
 
 var exampleMerchantCurrency = "GBP"
-var exampleMerchantID int32 = 99
+var exampleMerchantIDVal int32 = 99
 var exampleMerchantName = "Test Shop"
 var exampleMerchantStatus = "A"
 var exampleMerchantLabel = "Active"
@@ -17,7 +17,7 @@ var exampleMerchantLabel = "Active"
 func buildExampleMerchant() openapiclient.Merchant {
 	m := openapiclient.NewMerchant()
 	m.SetCurrency(exampleMerchantCurrency)
-	m.SetMerchantid(exampleMerchantID)
+	m.SetMerchantid(exampleMerchantIDVal)
 	m.SetName(exampleMerchantName)
 	m.SetStatus(exampleMerchantStatus)
 	m.SetStatusLabel(exampleMerchantLabel)
@@ -53,9 +53,9 @@ func TestMerchantSetGetCycle(t *testing.T) {
 		assert.Equal(t, exampleMerchantCurrency, *val)
 	}
 
-	model.SetMerchantid(exampleMerchantID)
+	model.SetMerchantid(exampleMerchantIDVal)
 	assert.True(t, model.HasMerchantid())
-	assert.Equal(t, exampleMerchantID, model.GetMerchantid())
+	assert.Equal(t, exampleMerchantIDVal, model.GetMerchantid())
 
 	model.SetName(exampleMerchantName)
 	assert.True(t, model.HasName())
@@ -90,7 +90,7 @@ func TestMerchantToMap(t *testing.T) {
 		assert.Equal(t, &exampleMerchantCurrency, m["currency"])
 	}
 	if assert.Contains(t, m, "merchantid") {
-		assert.Equal(t, &exampleMerchantID, m["merchantid"])
+		assert.Equal(t, &exampleMerchantIDVal, m["merchantid"])
 	}
 	if assert.Contains(t, m, "name") {
 		assert.Equal(t, &exampleMerchantName, m["name"])
@@ -131,6 +131,6 @@ func TestNullableMerchantJSONRoundTrip(t *testing.T) {
 	require.NoError(t, err)
 	assert.True(t, newN.IsSet())
 	if assert.NotNil(t, newN.Get()) {
-		assert.Equal(t, exampleMerchantID, newN.Get().GetMerchantid())
+		assert.Equal(t, exampleMerchantIDVal, newN.Get().GetMerchantid())
 	}
 }
