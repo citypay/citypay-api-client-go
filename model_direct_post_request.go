@@ -3,7 +3,7 @@ CityPay Payment API
 
  Welcome to the CityPay API, a robust HTTP API payment solution designed for seamless server-to-server  transactional processing. Our API facilitates a wide array of payment operations, catering to diverse business needs.  Whether you're integrating Internet payments, handling Mail Order/Telephone Order (MOTO) transactions, managing  Subscriptions with Recurring and Continuous Authority payments, or navigating the complexities of 3-D Secure  authentication, our API is equipped to support your requirements. Additionally, we offer functionalities for  Authorisation, Refunding, Pre-Authorisation, Cancellation/Voids, and Completion processing, alongside the capability  for tokenised payments.  ## Compliance and Security Overview <aside class=\"notice\">   Ensuring the security of payment transactions and compliance with industry standards is paramount. Our API is    designed with stringent security measures and compliance protocols to safeguard sensitive information and meet    the rigorous requirements of Visa, MasterCard, and the PCI Security Standards Council. </aside>  ### Key Compliance and Security Measures  * **TLS Encryption**: All data transmissions must utilise TLS version 1.2 or higher, employing [strong cryptography](#enabled-tls-ciphers). Our infrastructure strictly enforces this requirement to maintain the integrity and confidentiality of data in transit. We conduct regular scans and assessments of our TLS endpoints to identify and mitigate vulnerabilities. * **Data Storage Prohibitions**: Storing sensitive cardholder data (CHD), such as the card security code (CSC) or primary account number (PAN), is strictly prohibited. Our API is designed to minimize your exposure to sensitive data, thereby reducing your compliance burden. * **Data Masking**: For consumer protection and compliance, full card numbers must not be displayed on receipts or any customer-facing materials. Our API automatically masks PANs, displaying only the last four digits to facilitate safe receipt generation. * **Network Scans**: If your application is web-based, regular scans of your hosting environment are mandatory to identify and rectify potential vulnerabilities. This proactive measure is crucial for maintaining a secure and compliant online presence. * **PCI Compliance**: Adherence to PCI DSS standards is not optional; it's a requirement for operating securely and legally in the payments ecosystem. For detailed information on compliance requirements and resources, please visit the PCI Security Standards Council website [https://www.pcisecuritystandards.org/](https://www.pcisecuritystandards.org/). * **Request Validation**: Our API includes mechanisms to verify the legitimacy of each request, ensuring it pertains to a valid account and originates from a trusted source. We leverage remote IP address verification alongside sophisticated application firewall technologies to thwart a wide array of common security threats.  ## Getting Started Before integrating with the CityPay API, ensure your application and development practices align with the outlined compliance and security measures. This preparatory step is crucial for a smooth integration process and the long-term success of your payment processing operations.  For further details on API endpoints, request/response formats, and code examples, proceed to the subsequent sections of our documentation. Our aim is to provide you with all the necessary tools and information to integrate our payment processing capabilities seamlessly into your application.  Thank you for choosing CityPay API. We look forward to supporting your payment processing needs with our secure, compliant, and versatile API solution.
 
-API version: 6.6.40
+API version: 6.9.9
 Contact: support@citypay.com
 */
 
@@ -28,7 +28,7 @@ type DirectPostRequest struct {
 	AvsPostcodePolicy *string         `json:"avs_postcode_policy,omitempty"`
 	BillTo            *ContactDetails `json:"bill_to,omitempty"`
 	// The card number (PAN) with a variable length to a maximum of 21 digits in numerical form. Any non numeric characters will be stripped out of the card number, this includes whitespace or separators internal of the provided value.  The card number must be treated as sensitive data. We only provide an obfuscated value in logging and reporting.  The plaintext value is encrypted in our database using AES 256 GMC bit encryption for settlement or refund purposes.  When providing the card number to our gateway through the authorisation API you will be handling the card data on your application. This will require further PCI controls to be in place and this value must never be stored.
-	Cardnumber string `json:"cardnumber"`
+	Cardnumber *string `json:"cardnumber,omitempty"`
 	// The Card Security Code (CSC) (also known as CV2/CVV2) is normally found on the back of the card (American Express has it on the front). The value helps to identify possession of the card as it is not available within the chip or magnetic swipe.  When forwarding the CSC, please ensure the value is a string as some values start with 0 and this will be stripped out by any integer parsing.  The CSC number aids fraud prevention in Mail Order and Internet payments.  Business rules are available on your account to identify whether to accept or decline transactions based on mismatched results of the CSC.  The Payment Card Industry (PCI) requires that at no stage of a transaction should the CSC be stored.  This applies to all entities handling card data.  It should also not be used in any hashing process.  CityPay do not store the value and have no method of retrieving the value once the transaction has been processed. For this reason, duplicate checking is unable to determine the CSC in its duplication check algorithm.
 	Csc *string `json:"csc,omitempty"`
 	// A policy value which determines whether a CSC policy is enforced or bypassed.  Values are:   `0` for the default policy (default value if not supplied). Your default values are determined by your account manager on setup of the account.   `1` for an enforced policy. Transactions that are enforced will be rejected if the CSC value does not match.   `2` to bypass. Transactions that are bypassed will be allowed through even if the CSC did not match.   `3` to ignore. Transactions that are ignored will bypass the result and not send the CSC details for authorisation.
@@ -38,9 +38,9 @@ type DirectPostRequest struct {
 	// A policy value which determines whether a duplication policy is enforced or bypassed. A duplication check has a window of time set against your account within which it can action. If a previous transaction with matching values occurred within the window, any subsequent transaction will result in a T001 result.  Values are   `0` for the default policy (default value if not supplied). Your default values are determined by your account manager on setup of the account.   `1` for an enforced policy. Transactions that are enforced will be checked for duplication within the duplication window.   `2` to bypass. Transactions that are bypassed will not be checked for duplication within the duplication window.   `3` to ignore. Transactions that are ignored will have the same affect as bypass.
 	DuplicatePolicy *string `json:"duplicate_policy,omitempty"`
 	// The month of expiry of the card. The month value should be a numerical value between 1 and 12.
-	Expmonth int32 `json:"expmonth"`
+	Expmonth *int32 `json:"expmonth,omitempty"`
 	// The year of expiry of the card.
-	Expyear int32 `json:"expyear"`
+	Expyear *int32 `json:"expyear,omitempty"`
 	// The identifier of the transaction to process. The value should be a valid reference and may be used to perform  post processing actions and to aid in reconciliation of transactions.  The value should be a valid printable string with ASCII character ranges from 0x32 to 0x127.  The identifier is recommended to be distinct for each transaction such as a [random unique identifier](https://en.wikipedia.org/wiki/Universally_unique_identifier) this will aid in ensuring each transaction is identifiable.  When transactions are processed they are also checked for duplicate requests. Changing the identifier on a subsequent request will ensure that a transaction is considered as different.
 	Identifier string `json:"identifier"`
 	// A message authentication code ensures the data is authentic and that the intended amount has not been tampered with. The mac value is generated using a hash-based mac value. The following algorithm is used. - A key (k) is derived from your licence key - A value (v) is produced by concatenating the nonce, amount value and identifier, such as a purchase   with nonce `0123456789ABCDEF` an amount of £275.95 and an identifier of OD-12345678 would become   `0123456789ABCDEF27595OD-12345678` and extracting the UTF-8 byte values - The result from HMAC_SHA256(k, v) is hex-encoded (upper-case) - For instance, a licence key of `LK123456789`, a nonce of `0123456789ABCDEF`, an amount of `27595` and an identifier of `OD-12345678`  would generate a MAC of `163DBAB194D743866A9BCC7FC9C8A88FCD99C6BBBF08D619291212D1B91EE12E`.
@@ -51,6 +51,8 @@ type DirectPostRequest struct {
 	NameOnCard *string `json:"name_on_card,omitempty"`
 	// A random value Hex string (uppercase) which is provided to the API to perform a digest. The value will be used in any digest function.
 	Nonce *string `json:"nonce,omitempty"`
+	// A policy value which determines whether a pre auth policy is enforced or bypassed.  Values are:   `0` for the default policy (default value if not supplied). Your default values are determined by your account manager on setup of the account.   `1` for an enforced policy.  Enforces pre-authorisation when it does not pre-auth by default.   `2` to bypass. Bypasses pre-authorisation when it is enabled to pre auth by default.   `3` to ignore. The same as the default policy (0). Although it currently mirrors the default, this option is included for compatibility with other policies.
+	PreAuth *string `json:"pre_auth,omitempty"`
 	// The URL used to redirect back to your site when a transaction has been rejected or declined. Required if a url-encoded request.
 	RedirectFailure *string `json:"redirect_failure,omitempty"`
 	// The URL used to redirect back to your site when a transaction has been tokenised or authorised. Required if a url-encoded request.
@@ -62,6 +64,8 @@ type DirectPostRequest struct {
 	TransInfo *string `json:"trans_info,omitempty"`
 	// The type of transaction being submitted. Normally this value is not required and your account manager may request that you set this field.
 	TransType *string `json:"trans_type,omitempty"`
+	// A uuid for the session. The value tracks through 3ds session and therefore should be a valid v4 uuid.
+	Uuid *string `json:"uuid,omitempty"`
 }
 
 type _DirectPostRequest DirectPostRequest
@@ -70,12 +74,9 @@ type _DirectPostRequest DirectPostRequest
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewDirectPostRequest(amount int32, cardnumber string, expmonth int32, expyear int32, identifier string, mac string) *DirectPostRequest {
+func NewDirectPostRequest(amount int32, identifier string, mac string) *DirectPostRequest {
 	this := DirectPostRequest{}
 	this.Amount = amount
-	this.Cardnumber = cardnumber
-	this.Expmonth = expmonth
-	this.Expyear = expyear
 	this.Identifier = identifier
 	this.Mac = mac
 	return &this
@@ -177,28 +178,36 @@ func (o *DirectPostRequest) SetBillTo(v ContactDetails) {
 	o.BillTo = &v
 }
 
-// GetCardnumber returns the Cardnumber field value
+// GetCardnumber returns the Cardnumber field value if set, zero value otherwise.
 func (o *DirectPostRequest) GetCardnumber() string {
-	if o == nil {
+	if o == nil || IsNil(o.Cardnumber) {
 		var ret string
 		return ret
 	}
-
-	return o.Cardnumber
+	return *o.Cardnumber
 }
 
-// GetCardnumberOk returns a tuple with the Cardnumber field value
+// GetCardnumberOk returns a tuple with the Cardnumber field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *DirectPostRequest) GetCardnumberOk() (*string, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.Cardnumber) {
 		return nil, false
 	}
-	return &o.Cardnumber, true
+	return o.Cardnumber, true
 }
 
-// SetCardnumber sets field value
+// HasCardnumber returns a boolean if a field has been set.
+func (o *DirectPostRequest) HasCardnumber() bool {
+	if o != nil && !IsNil(o.Cardnumber) {
+		return true
+	}
+
+	return false
+}
+
+// SetCardnumber gets a reference to the given string and assigns it to the Cardnumber field.
 func (o *DirectPostRequest) SetCardnumber(v string) {
-	o.Cardnumber = v
+	o.Cardnumber = &v
 }
 
 // GetCsc returns the Csc field value if set, zero value otherwise.
@@ -329,52 +338,68 @@ func (o *DirectPostRequest) SetDuplicatePolicy(v string) {
 	o.DuplicatePolicy = &v
 }
 
-// GetExpmonth returns the Expmonth field value
+// GetExpmonth returns the Expmonth field value if set, zero value otherwise.
 func (o *DirectPostRequest) GetExpmonth() int32 {
-	if o == nil {
+	if o == nil || IsNil(o.Expmonth) {
 		var ret int32
 		return ret
 	}
-
-	return o.Expmonth
+	return *o.Expmonth
 }
 
-// GetExpmonthOk returns a tuple with the Expmonth field value
+// GetExpmonthOk returns a tuple with the Expmonth field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *DirectPostRequest) GetExpmonthOk() (*int32, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.Expmonth) {
 		return nil, false
 	}
-	return &o.Expmonth, true
+	return o.Expmonth, true
 }
 
-// SetExpmonth sets field value
+// HasExpmonth returns a boolean if a field has been set.
+func (o *DirectPostRequest) HasExpmonth() bool {
+	if o != nil && !IsNil(o.Expmonth) {
+		return true
+	}
+
+	return false
+}
+
+// SetExpmonth gets a reference to the given int32 and assigns it to the Expmonth field.
 func (o *DirectPostRequest) SetExpmonth(v int32) {
-	o.Expmonth = v
+	o.Expmonth = &v
 }
 
-// GetExpyear returns the Expyear field value
+// GetExpyear returns the Expyear field value if set, zero value otherwise.
 func (o *DirectPostRequest) GetExpyear() int32 {
-	if o == nil {
+	if o == nil || IsNil(o.Expyear) {
 		var ret int32
 		return ret
 	}
-
-	return o.Expyear
+	return *o.Expyear
 }
 
-// GetExpyearOk returns a tuple with the Expyear field value
+// GetExpyearOk returns a tuple with the Expyear field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *DirectPostRequest) GetExpyearOk() (*int32, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.Expyear) {
 		return nil, false
 	}
-	return &o.Expyear, true
+	return o.Expyear, true
 }
 
-// SetExpyear sets field value
+// HasExpyear returns a boolean if a field has been set.
+func (o *DirectPostRequest) HasExpyear() bool {
+	if o != nil && !IsNil(o.Expyear) {
+		return true
+	}
+
+	return false
+}
+
+// SetExpyear gets a reference to the given int32 and assigns it to the Expyear field.
 func (o *DirectPostRequest) SetExpyear(v int32) {
-	o.Expyear = v
+	o.Expyear = &v
 }
 
 // GetIdentifier returns the Identifier field value
@@ -519,6 +544,38 @@ func (o *DirectPostRequest) HasNonce() bool {
 // SetNonce gets a reference to the given string and assigns it to the Nonce field.
 func (o *DirectPostRequest) SetNonce(v string) {
 	o.Nonce = &v
+}
+
+// GetPreAuth returns the PreAuth field value if set, zero value otherwise.
+func (o *DirectPostRequest) GetPreAuth() string {
+	if o == nil || IsNil(o.PreAuth) {
+		var ret string
+		return ret
+	}
+	return *o.PreAuth
+}
+
+// GetPreAuthOk returns a tuple with the PreAuth field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *DirectPostRequest) GetPreAuthOk() (*string, bool) {
+	if o == nil || IsNil(o.PreAuth) {
+		return nil, false
+	}
+	return o.PreAuth, true
+}
+
+// HasPreAuth returns a boolean if a field has been set.
+func (o *DirectPostRequest) HasPreAuth() bool {
+	if o != nil && !IsNil(o.PreAuth) {
+		return true
+	}
+
+	return false
+}
+
+// SetPreAuth gets a reference to the given string and assigns it to the PreAuth field.
+func (o *DirectPostRequest) SetPreAuth(v string) {
+	o.PreAuth = &v
 }
 
 // GetRedirectFailure returns the RedirectFailure field value if set, zero value otherwise.
@@ -745,6 +802,38 @@ func (o *DirectPostRequest) SetTransType(v string) {
 	o.TransType = &v
 }
 
+// GetUuid returns the Uuid field value if set, zero value otherwise.
+func (o *DirectPostRequest) GetUuid() string {
+	if o == nil || IsNil(o.Uuid) {
+		var ret string
+		return ret
+	}
+	return *o.Uuid
+}
+
+// GetUuidOk returns a tuple with the Uuid field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *DirectPostRequest) GetUuidOk() (*string, bool) {
+	if o == nil || IsNil(o.Uuid) {
+		return nil, false
+	}
+	return o.Uuid, true
+}
+
+// HasUuid returns a boolean if a field has been set.
+func (o *DirectPostRequest) HasUuid() bool {
+	if o != nil && !IsNil(o.Uuid) {
+		return true
+	}
+
+	return false
+}
+
+// SetUuid gets a reference to the given string and assigns it to the Uuid field.
+func (o *DirectPostRequest) SetUuid(v string) {
+	o.Uuid = &v
+}
+
 func (o DirectPostRequest) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -762,7 +851,9 @@ func (o DirectPostRequest) ToMap() (map[string]interface{}, error) {
 	if !IsNil(o.BillTo) {
 		toSerialize["bill_to"] = o.BillTo
 	}
-	toSerialize["cardnumber"] = o.Cardnumber
+	if !IsNil(o.Cardnumber) {
+		toSerialize["cardnumber"] = o.Cardnumber
+	}
 	if !IsNil(o.Csc) {
 		toSerialize["csc"] = o.Csc
 	}
@@ -775,8 +866,12 @@ func (o DirectPostRequest) ToMap() (map[string]interface{}, error) {
 	if !IsNil(o.DuplicatePolicy) {
 		toSerialize["duplicate_policy"] = o.DuplicatePolicy
 	}
-	toSerialize["expmonth"] = o.Expmonth
-	toSerialize["expyear"] = o.Expyear
+	if !IsNil(o.Expmonth) {
+		toSerialize["expmonth"] = o.Expmonth
+	}
+	if !IsNil(o.Expyear) {
+		toSerialize["expyear"] = o.Expyear
+	}
 	toSerialize["identifier"] = o.Identifier
 	toSerialize["mac"] = o.Mac
 	if !IsNil(o.MatchAvsa) {
@@ -787,6 +882,9 @@ func (o DirectPostRequest) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.Nonce) {
 		toSerialize["nonce"] = o.Nonce
+	}
+	if !IsNil(o.PreAuth) {
+		toSerialize["pre_auth"] = o.PreAuth
 	}
 	if !IsNil(o.RedirectFailure) {
 		toSerialize["redirect_failure"] = o.RedirectFailure
@@ -809,6 +907,9 @@ func (o DirectPostRequest) ToMap() (map[string]interface{}, error) {
 	if !IsNil(o.TransType) {
 		toSerialize["trans_type"] = o.TransType
 	}
+	if !IsNil(o.Uuid) {
+		toSerialize["uuid"] = o.Uuid
+	}
 	return toSerialize, nil
 }
 
@@ -818,9 +919,6 @@ func (o *DirectPostRequest) UnmarshalJSON(data []byte) (err error) {
 	// that every required field exists as a key in the generic map.
 	requiredProperties := []string{
 		"amount",
-		"cardnumber",
-		"expmonth",
-		"expyear",
 		"identifier",
 		"mac",
 	}

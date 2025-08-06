@@ -4,10 +4,11 @@ All URIs are relative to *https://api.citypay.com*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
+[**PaylinkTokenCloseRequest**](PaylinkApi.md#PaylinkTokenCloseRequest) | **Put** /paylink/{token}/close | Close Paylink Token
 [**TokenAdjustmentRequest**](PaylinkApi.md#TokenAdjustmentRequest) | **Post** /paylink/{token}/adjustment | Paylink Token Adjustment
+[**TokenAttachmentStatus**](PaylinkApi.md#TokenAttachmentStatus) | **Get** /paylink/{token}/attachment-status/{attachment} | Checks an attachment status
 [**TokenCancelRequest**](PaylinkApi.md#TokenCancelRequest) | **Put** /paylink/{token}/cancel | Cancel a Paylink Token
 [**TokenChangesRequest**](PaylinkApi.md#TokenChangesRequest) | **Post** /paylink/token/changes | Paylink Token Audit
-[**TokenCloseRequest**](PaylinkApi.md#TokenCloseRequest) | **Put** /paylink/{token}/close | Close Paylink Token
 [**TokenCreateBillPaymentRequest**](PaylinkApi.md#TokenCreateBillPaymentRequest) | **Post** /paylink/bill-payment | Create Bill Payment Paylink Token
 [**TokenCreateRequest**](PaylinkApi.md#TokenCreateRequest) | **Post** /paylink/create | Create Paylink Token
 [**TokenPurgeAttachmentsRequest**](PaylinkApi.md#TokenPurgeAttachmentsRequest) | **Put** /paylink/{token}/purge-attachments | Purges any attachments for a Paylink Token
@@ -16,6 +17,76 @@ Method | HTTP request | Description
 [**TokenResendNotificationRequest**](PaylinkApi.md#TokenResendNotificationRequest) | **Post** /paylink/{token}/resend-notification | Resend a notification for Paylink Token
 [**TokenStatusRequest**](PaylinkApi.md#TokenStatusRequest) | **Get** /paylink/{token}/status | Paylink Token Status
 
+
+
+## PaylinkTokenCloseRequest
+
+> Acknowledgement PaylinkTokenCloseRequest(ctx, token).Execute()
+
+Close Paylink Token
+
+
+
+### Example
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/citypay/citypay-api-client-go/citypay"
+)
+
+func main() {
+	token := "token_example" // string | The token returned by the create token process.
+
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.PaylinkApi.PaylinkTokenCloseRequest(context.Background(), token).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `PaylinkApi.PaylinkTokenCloseRequest``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `PaylinkTokenCloseRequest`: Acknowledgement
+	fmt.Fprintf(os.Stdout, "Response from `PaylinkApi.PaylinkTokenCloseRequest`: %v\n", resp)
+}
+```
+
+### Path Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**token** | **string** | The token returned by the create token process. | 
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiPaylinkTokenCloseRequestRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
+
+### Return type
+
+[**Acknowledgement**](Acknowledgement.md)
+
+### Authorization
+
+[cp-api-key](../README.md#cp-api-key)
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json, text/xml
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
 
 
 ## TokenAdjustmentRequest
@@ -83,6 +154,79 @@ Name | Type | Description  | Notes
 ### HTTP request headers
 
 - **Content-Type**: application/json, text/xml
+- **Accept**: application/json, text/xml
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## TokenAttachmentStatus
+
+> Acknowledgement TokenAttachmentStatus(ctx, token, attachment).Execute()
+
+Checks an attachment status
+
+
+
+### Example
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/citypay/citypay-api-client-go/citypay"
+)
+
+func main() {
+	token := "token_example" // string | The token returned by the create token process.
+	attachment := "attachment_example" // string | The attachemnt name requested.
+
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.PaylinkApi.TokenAttachmentStatus(context.Background(), token, attachment).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `PaylinkApi.TokenAttachmentStatus``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `TokenAttachmentStatus`: Acknowledgement
+	fmt.Fprintf(os.Stdout, "Response from `PaylinkApi.TokenAttachmentStatus`: %v\n", resp)
+}
+```
+
+### Path Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**token** | **string** | The token returned by the create token process. | 
+**attachment** | **string** | The attachemnt name requested. | 
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiTokenAttachmentStatusRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
+
+
+### Return type
+
+[**Acknowledgement**](Acknowledgement.md)
+
+### Authorization
+
+[cp-api-key](../README.md#cp-api-key)
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
 - **Accept**: application/json, text/xml
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
@@ -220,76 +364,6 @@ Name | Type | Description  | Notes
 ### HTTP request headers
 
 - **Content-Type**: application/json, text/xml
-- **Accept**: application/json, text/xml
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to README]](../README.md)
-
-
-## TokenCloseRequest
-
-> Acknowledgement TokenCloseRequest(ctx, token).Execute()
-
-Close Paylink Token
-
-
-
-### Example
-
-```go
-package main
-
-import (
-	"context"
-	"fmt"
-	"os"
-	openapiclient "github.com/citypay/citypay-api-client-go/citypay"
-)
-
-func main() {
-	token := "token_example" // string | The token returned by the create token process.
-
-	configuration := openapiclient.NewConfiguration()
-	apiClient := openapiclient.NewAPIClient(configuration)
-	resp, r, err := apiClient.PaylinkApi.TokenCloseRequest(context.Background(), token).Execute()
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `PaylinkApi.TokenCloseRequest``: %v\n", err)
-		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-	}
-	// response from `TokenCloseRequest`: Acknowledgement
-	fmt.Fprintf(os.Stdout, "Response from `PaylinkApi.TokenCloseRequest`: %v\n", resp)
-}
-```
-
-### Path Parameters
-
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**token** | **string** | The token returned by the create token process. | 
-
-### Other Parameters
-
-Other parameters are passed through a pointer to a apiTokenCloseRequestRequest struct via the builder pattern
-
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-
-
-### Return type
-
-[**Acknowledgement**](Acknowledgement.md)
-
-### Authorization
-
-[cp-api-key](../README.md#cp-api-key)
-
-### HTTP request headers
-
-- **Content-Type**: Not defined
 - **Accept**: application/json, text/xml
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)

@@ -114,7 +114,7 @@ import (
 
 func main() {
 	accountid := "accountid_example" // string | The account id that refers to the customer's account no. This value will have been provided when setting up the card holder account.
-	registerCard := *openapiclient.NewRegisterCard("4000 0000 0000 0002", int32(9), int32(2027)) // RegisterCard | 
+	registerCard := *openapiclient.NewRegisterCard("4000 0000 0000 0002", int32(9), int32(2028)) // RegisterCard | 
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)

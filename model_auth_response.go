@@ -3,7 +3,7 @@ CityPay Payment API
 
  Welcome to the CityPay API, a robust HTTP API payment solution designed for seamless server-to-server  transactional processing. Our API facilitates a wide array of payment operations, catering to diverse business needs.  Whether you're integrating Internet payments, handling Mail Order/Telephone Order (MOTO) transactions, managing  Subscriptions with Recurring and Continuous Authority payments, or navigating the complexities of 3-D Secure  authentication, our API is equipped to support your requirements. Additionally, we offer functionalities for  Authorisation, Refunding, Pre-Authorisation, Cancellation/Voids, and Completion processing, alongside the capability  for tokenised payments.  ## Compliance and Security Overview <aside class=\"notice\">   Ensuring the security of payment transactions and compliance with industry standards is paramount. Our API is    designed with stringent security measures and compliance protocols to safeguard sensitive information and meet    the rigorous requirements of Visa, MasterCard, and the PCI Security Standards Council. </aside>  ### Key Compliance and Security Measures  * **TLS Encryption**: All data transmissions must utilise TLS version 1.2 or higher, employing [strong cryptography](#enabled-tls-ciphers). Our infrastructure strictly enforces this requirement to maintain the integrity and confidentiality of data in transit. We conduct regular scans and assessments of our TLS endpoints to identify and mitigate vulnerabilities. * **Data Storage Prohibitions**: Storing sensitive cardholder data (CHD), such as the card security code (CSC) or primary account number (PAN), is strictly prohibited. Our API is designed to minimize your exposure to sensitive data, thereby reducing your compliance burden. * **Data Masking**: For consumer protection and compliance, full card numbers must not be displayed on receipts or any customer-facing materials. Our API automatically masks PANs, displaying only the last four digits to facilitate safe receipt generation. * **Network Scans**: If your application is web-based, regular scans of your hosting environment are mandatory to identify and rectify potential vulnerabilities. This proactive measure is crucial for maintaining a secure and compliant online presence. * **PCI Compliance**: Adherence to PCI DSS standards is not optional; it's a requirement for operating securely and legally in the payments ecosystem. For detailed information on compliance requirements and resources, please visit the PCI Security Standards Council website [https://www.pcisecuritystandards.org/](https://www.pcisecuritystandards.org/). * **Request Validation**: Our API includes mechanisms to verify the legitimacy of each request, ensuring it pertains to a valid account and originates from a trusted source. We leverage remote IP address verification alongside sophisticated application firewall technologies to thwart a wide array of common security threats.  ## Getting Started Before integrating with the CityPay API, ensure your application and development practices align with the outlined compliance and security measures. This preparatory step is crucial for a smooth integration process and the long-term success of your payment processing operations.  For further details on API endpoints, request/response formats, and code examples, proceed to the subsequent sections of our documentation. Our aim is to provide you with all the necessary tools and information to integrate our payment processing capabilities seamlessly into your application.  Thank you for choosing CityPay API. We look forward to supporting your payment processing needs with our secure, compliant, and versatile API solution.
 
-API version: 6.6.40
+API version: 6.9.9
 Contact: support@citypay.com
 */
 
@@ -43,7 +43,7 @@ type AuthResponse struct {
 	BinDebit *bool `json:"bin_debit,omitempty"`
 	// A description of the bin range found for the card.
 	BinDescription *string `json:"bin_description,omitempty"`
-	// The cardholder authentication verification value which can be returned for verification purposes of the authenticated  transaction for dispute realisation.
+	// The cardholder authentication verification value which can be returned for verification purposes of the authenticated  transaction for dispute realisation. The value is considered sensitive in the realm of PCI-3DS and is masked.
 	Cavv *string `json:"cavv,omitempty"`
 	// The context which processed the transaction, can be used for support purposes to trace transactions.
 	Context *string `json:"context,omitempty"`
@@ -55,6 +55,10 @@ type AuthResponse struct {
 	Datetime *time.Time `json:"datetime,omitempty"`
 	// An Electronic Commerce Indicator (ECI) used to identify the result of authentication using 3DSecure.
 	Eci *string `json:"eci,omitempty"`
+	// An external ref if supplied.
+	ExternalRef *string `json:"external-ref,omitempty"`
+	// An external ref source if supplied.
+	ExternalRefSource *string `json:"external-ref-source,omitempty"`
 	// The identifier provided within the request.
 	Identifier *string `json:"identifier,omitempty"`
 	// Used to identify that a transaction was processed on a live authorisation platform.
@@ -63,6 +67,8 @@ type AuthResponse struct {
 	Maskedpan *string `json:"maskedpan,omitempty"`
 	// The merchant id that processed this transaction.
 	Merchantid int32 `json:"merchantid"`
+	// A payment intent id for the authorisation if it exists.
+	PaymentIntentId *string `json:"payment_intent_id,omitempty"`
 	// An integer result that indicates the outcome of the transaction. The Code value below maps to the result value  <table> <tr> <th>Code</th> <th>Abbrev</th> <th>Description</th> </tr> <tr><td>0</td><td>Declined</td><td>Declined</td></tr> <tr><td>1</td><td>Accepted</td><td>Accepted</td></tr> <tr><td>2</td><td>Rejected</td><td>Rejected</td></tr> <tr><td>3</td><td>Not Attempted</td><td>Not Attempted</td></tr> <tr><td>4</td><td>Referred</td><td>Referred</td></tr> <tr><td>5</td><td>PinRetry</td><td>Perform PIN Retry</td></tr> <tr><td>6</td><td>ForSigVer</td><td>Force Signature Verification</td></tr> <tr><td>7</td><td>Hold</td><td>Hold</td></tr> <tr><td>8</td><td>SecErr</td><td>Security Error</td></tr> <tr><td>9</td><td>CallAcq</td><td>Call Acquirer</td></tr> <tr><td>10</td><td>DNH</td><td>Do Not Honour</td></tr> <tr><td>11</td><td>RtnCrd</td><td>Retain Card</td></tr> <tr><td>12</td><td>ExprdCrd</td><td>Expired Card</td></tr> <tr><td>13</td><td>InvldCrd</td><td>Invalid Card No</td></tr> <tr><td>14</td><td>PinExcd</td><td>Pin Tries Exceeded</td></tr> <tr><td>15</td><td>PinInvld</td><td>Pin Invalid</td></tr> <tr><td>16</td><td>AuthReq</td><td>Authentication Required</td></tr> <tr><td>17</td><td>AuthenFail</td><td>Authentication Failed</td></tr> <tr><td>18</td><td>Verified</td><td>Card Verified</td></tr> <tr><td>19</td><td>Cancelled</td><td>Cancelled</td></tr> <tr><td>20</td><td>Un</td><td>Unknown</td></tr> <tr><td>21</td><td>Challenged</td><td>Challenged</td></tr> <tr><td>22</td><td>Decoupled</td><td>Decoupled</td></tr> <tr><td>23</td><td>Denied</td><td>Permission Denied</td></tr> </table>
 	Result int32 `json:"result"`
 	// The result code as defined in the Response Codes Reference for example 000 is an accepted live transaction whilst 001 is an accepted test transaction. Result codes identify the source of success and failure.  Codes may start with an alpha character i.e. C001 indicating a type of error such as a card validation error.
@@ -618,6 +624,70 @@ func (o *AuthResponse) SetEci(v string) {
 	o.Eci = &v
 }
 
+// GetExternalRef returns the ExternalRef field value if set, zero value otherwise.
+func (o *AuthResponse) GetExternalRef() string {
+	if o == nil || IsNil(o.ExternalRef) {
+		var ret string
+		return ret
+	}
+	return *o.ExternalRef
+}
+
+// GetExternalRefOk returns a tuple with the ExternalRef field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *AuthResponse) GetExternalRefOk() (*string, bool) {
+	if o == nil || IsNil(o.ExternalRef) {
+		return nil, false
+	}
+	return o.ExternalRef, true
+}
+
+// HasExternalRef returns a boolean if a field has been set.
+func (o *AuthResponse) HasExternalRef() bool {
+	if o != nil && !IsNil(o.ExternalRef) {
+		return true
+	}
+
+	return false
+}
+
+// SetExternalRef gets a reference to the given string and assigns it to the ExternalRef field.
+func (o *AuthResponse) SetExternalRef(v string) {
+	o.ExternalRef = &v
+}
+
+// GetExternalRefSource returns the ExternalRefSource field value if set, zero value otherwise.
+func (o *AuthResponse) GetExternalRefSource() string {
+	if o == nil || IsNil(o.ExternalRefSource) {
+		var ret string
+		return ret
+	}
+	return *o.ExternalRefSource
+}
+
+// GetExternalRefSourceOk returns a tuple with the ExternalRefSource field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *AuthResponse) GetExternalRefSourceOk() (*string, bool) {
+	if o == nil || IsNil(o.ExternalRefSource) {
+		return nil, false
+	}
+	return o.ExternalRefSource, true
+}
+
+// HasExternalRefSource returns a boolean if a field has been set.
+func (o *AuthResponse) HasExternalRefSource() bool {
+	if o != nil && !IsNil(o.ExternalRefSource) {
+		return true
+	}
+
+	return false
+}
+
+// SetExternalRefSource gets a reference to the given string and assigns it to the ExternalRefSource field.
+func (o *AuthResponse) SetExternalRefSource(v string) {
+	o.ExternalRefSource = &v
+}
+
 // GetIdentifier returns the Identifier field value if set, zero value otherwise.
 func (o *AuthResponse) GetIdentifier() string {
 	if o == nil || IsNil(o.Identifier) {
@@ -736,6 +806,38 @@ func (o *AuthResponse) GetMerchantidOk() (*int32, bool) {
 // SetMerchantid sets field value
 func (o *AuthResponse) SetMerchantid(v int32) {
 	o.Merchantid = v
+}
+
+// GetPaymentIntentId returns the PaymentIntentId field value if set, zero value otherwise.
+func (o *AuthResponse) GetPaymentIntentId() string {
+	if o == nil || IsNil(o.PaymentIntentId) {
+		var ret string
+		return ret
+	}
+	return *o.PaymentIntentId
+}
+
+// GetPaymentIntentIdOk returns a tuple with the PaymentIntentId field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *AuthResponse) GetPaymentIntentIdOk() (*string, bool) {
+	if o == nil || IsNil(o.PaymentIntentId) {
+		return nil, false
+	}
+	return o.PaymentIntentId, true
+}
+
+// HasPaymentIntentId returns a boolean if a field has been set.
+func (o *AuthResponse) HasPaymentIntentId() bool {
+	if o != nil && !IsNil(o.PaymentIntentId) {
+		return true
+	}
+
+	return false
+}
+
+// SetPaymentIntentId gets a reference to the given string and assigns it to the PaymentIntentId field.
+func (o *AuthResponse) SetPaymentIntentId(v string) {
+	o.PaymentIntentId = &v
 }
 
 // GetResult returns the Result field value
@@ -1060,6 +1162,12 @@ func (o AuthResponse) ToMap() (map[string]interface{}, error) {
 	if !IsNil(o.Eci) {
 		toSerialize["eci"] = o.Eci
 	}
+	if !IsNil(o.ExternalRef) {
+		toSerialize["external-ref"] = o.ExternalRef
+	}
+	if !IsNil(o.ExternalRefSource) {
+		toSerialize["external-ref-source"] = o.ExternalRefSource
+	}
 	if !IsNil(o.Identifier) {
 		toSerialize["identifier"] = o.Identifier
 	}
@@ -1070,6 +1178,9 @@ func (o AuthResponse) ToMap() (map[string]interface{}, error) {
 		toSerialize["maskedpan"] = o.Maskedpan
 	}
 	toSerialize["merchantid"] = o.Merchantid
+	if !IsNil(o.PaymentIntentId) {
+		toSerialize["payment_intent_id"] = o.PaymentIntentId
+	}
 	toSerialize["result"] = o.Result
 	toSerialize["result_code"] = o.ResultCode
 	toSerialize["result_message"] = o.ResultMessage

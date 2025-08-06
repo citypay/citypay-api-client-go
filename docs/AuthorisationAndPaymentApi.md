@@ -8,10 +8,10 @@ Method | HTTP request | Description
 [**BinRangeLookupRequest**](AuthorisationAndPaymentApi.md#BinRangeLookupRequest) | **Post** /v6/bin | Bin Lookup
 [**CResRequest**](AuthorisationAndPaymentApi.md#CResRequest) | **Post** /v6/cres | CRes
 [**CaptureRequest**](AuthorisationAndPaymentApi.md#CaptureRequest) | **Post** /v6/capture | Capture
-[**CreatePaymentIntent**](AuthorisationAndPaymentApi.md#CreatePaymentIntent) | **Post** /v6/intent/create | Create a Payment Intent
-[**PaResRequest**](AuthorisationAndPaymentApi.md#PaResRequest) | **Post** /v6/pares | PaRes
+[**CardTokenisationRequest**](AuthorisationAndPaymentApi.md#CardTokenisationRequest) | **Post** /v6/tokenise | Card Tokenisation Request
 [**RefundRequest**](AuthorisationAndPaymentApi.md#RefundRequest) | **Post** /v6/refund | Refund
-[**RetrievalRequest**](AuthorisationAndPaymentApi.md#RetrievalRequest) | **Post** /v6/retrieve | Retrieval
+[**RetrievalRequest**](AuthorisationAndPaymentApi.md#RetrievalRequest) | **Post** /v6/retrieve | Transaction Retrieval
+[**VerificationRequest**](AuthorisationAndPaymentApi.md#VerificationRequest) | **Post** /v6/verify | Verification
 [**VoidRequest**](AuthorisationAndPaymentApi.md#VoidRequest) | **Post** /v6/void | Void
 
 
@@ -37,7 +37,7 @@ import (
 )
 
 func main() {
-	authRequest := *openapiclient.NewAuthRequest(int32(19995), "4000 0000 0000 0002", int32(9), int32(2027), "95b857a1-5955-4b86-963c-5a6dbfc4fb95", int32(11223344)) // AuthRequest | 
+	authRequest := *openapiclient.NewAuthRequest(int32(19995), "95b857a1-5955-4b86-963c-5a6dbfc4fb95", int32(11223344)) // AuthRequest | 
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
@@ -280,77 +280,11 @@ Name | Type | Description  | Notes
 [[Back to README]](../README.md)
 
 
-## CreatePaymentIntent
+## CardTokenisationRequest
 
-> PaymentIntentReference CreatePaymentIntent(ctx).PaymentIntent(paymentIntent).Execute()
+> CardTokenisationResponse CardTokenisationRequest(ctx).CardTokenisationRequest(cardTokenisationRequest).Execute()
 
-Create a Payment Intent
-
-
-
-### Example
-
-```go
-package main
-
-import (
-	"context"
-	"fmt"
-	"os"
-	openapiclient "github.com/citypay/citypay-api-client-go/citypay"
-)
-
-func main() {
-	paymentIntent := *openapiclient.NewPaymentIntent(int32(19995), "95b857a1-5955-4b86-963c-5a6dbfc4fb95") // PaymentIntent | 
-
-	configuration := openapiclient.NewConfiguration()
-	apiClient := openapiclient.NewAPIClient(configuration)
-	resp, r, err := apiClient.AuthorisationAndPaymentApi.CreatePaymentIntent(context.Background()).PaymentIntent(paymentIntent).Execute()
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `AuthorisationAndPaymentApi.CreatePaymentIntent``: %v\n", err)
-		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-	}
-	// response from `CreatePaymentIntent`: PaymentIntentReference
-	fmt.Fprintf(os.Stdout, "Response from `AuthorisationAndPaymentApi.CreatePaymentIntent`: %v\n", resp)
-}
-```
-
-### Path Parameters
-
-
-
-### Other Parameters
-
-Other parameters are passed through a pointer to a apiCreatePaymentIntentRequest struct via the builder pattern
-
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **paymentIntent** | [**PaymentIntent**](PaymentIntent.md) |  | 
-
-### Return type
-
-[**PaymentIntentReference**](PaymentIntentReference.md)
-
-### Authorization
-
-[cp-api-key](../README.md#cp-api-key)
-
-### HTTP request headers
-
-- **Content-Type**: application/json, text/xml
-- **Accept**: application/json, text/xml
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to README]](../README.md)
-
-
-## PaResRequest
-
-> AuthResponse PaResRequest(ctx).PaResAuthRequest(paResAuthRequest).Execute()
-
-PaRes
+Card Tokenisation Request
 
 
 
@@ -367,17 +301,17 @@ import (
 )
 
 func main() {
-	paResAuthRequest := *openapiclient.NewPaResAuthRequest("Md_example", "v66ycfSp8jNlvy7PkHbx44NEt3vox90+vZ/7Ll05Vid/jPfQn8adw+4D/vRDUGT19kndW97Hfirb...") // PaResAuthRequest | 
+	cardTokenisationRequest := *openapiclient.NewCardTokenisationRequest() // CardTokenisationRequest | 
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	resp, r, err := apiClient.AuthorisationAndPaymentApi.PaResRequest(context.Background()).PaResAuthRequest(paResAuthRequest).Execute()
+	resp, r, err := apiClient.AuthorisationAndPaymentApi.CardTokenisationRequest(context.Background()).CardTokenisationRequest(cardTokenisationRequest).Execute()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `AuthorisationAndPaymentApi.PaResRequest``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error when calling `AuthorisationAndPaymentApi.CardTokenisationRequest``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
-	// response from `PaResRequest`: AuthResponse
-	fmt.Fprintf(os.Stdout, "Response from `AuthorisationAndPaymentApi.PaResRequest`: %v\n", resp)
+	// response from `CardTokenisationRequest`: CardTokenisationResponse
+	fmt.Fprintf(os.Stdout, "Response from `AuthorisationAndPaymentApi.CardTokenisationRequest`: %v\n", resp)
 }
 ```
 
@@ -387,20 +321,20 @@ func main() {
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiPaResRequestRequest struct via the builder pattern
+Other parameters are passed through a pointer to a apiCardTokenisationRequestRequest struct via the builder pattern
 
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **paResAuthRequest** | [**PaResAuthRequest**](PaResAuthRequest.md) |  | 
+ **cardTokenisationRequest** | [**CardTokenisationRequest**](CardTokenisationRequest.md) |  | 
 
 ### Return type
 
-[**AuthResponse**](AuthResponse.md)
+[**CardTokenisationResponse**](CardTokenisationResponse.md)
 
 ### Authorization
 
-[cp-api-key](../README.md#cp-api-key)
+[cp-domain-key](../README.md#cp-domain-key), [cp-api-key](../README.md#cp-api-key)
 
 ### HTTP request headers
 
@@ -482,7 +416,7 @@ Name | Type | Description  | Notes
 
 > AuthReferences RetrievalRequest(ctx).RetrieveRequest(retrieveRequest).Execute()
 
-Retrieval
+Transaction Retrieval
 
 
 
@@ -529,6 +463,72 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**AuthReferences**](AuthReferences.md)
+
+### Authorization
+
+[cp-api-key](../README.md#cp-api-key)
+
+### HTTP request headers
+
+- **Content-Type**: application/json, text/xml
+- **Accept**: application/json, text/xml
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## VerificationRequest
+
+> Decision VerificationRequest(ctx).VerificationRequest(verificationRequest).Execute()
+
+Verification
+
+
+
+### Example
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/citypay/citypay-api-client-go/citypay"
+)
+
+func main() {
+	verificationRequest := *openapiclient.NewVerificationRequest(int32(19995), "95b857a1-5955-4b86-963c-5a6dbfc4fb95", int32(11223344)) // VerificationRequest | 
+
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.AuthorisationAndPaymentApi.VerificationRequest(context.Background()).VerificationRequest(verificationRequest).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `AuthorisationAndPaymentApi.VerificationRequest``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `VerificationRequest`: Decision
+	fmt.Fprintf(os.Stdout, "Response from `AuthorisationAndPaymentApi.VerificationRequest`: %v\n", resp)
+}
+```
+
+### Path Parameters
+
+
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiVerificationRequestRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **verificationRequest** | [**VerificationRequest**](VerificationRequest.md) |  | 
+
+### Return type
+
+[**Decision**](Decision.md)
 
 ### Authorization
 

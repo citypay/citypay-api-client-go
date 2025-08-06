@@ -7,6 +7,7 @@ Name | Type | Description | Notes
 **Domain** | **[]string** |  | 
 **Live** | Pointer to **bool** | Specifies if the key is to be used for production. Defaults to false.  | [optional] 
 **Merchantid** | **int32** | The merchant id the domain key is to be used for.  | 
+**Nonce** | Pointer to **string** | Specifies a random value for integrity. The value is used to generate the domain key to provide further integrity to the key.  | [optional] 
 
 ## Methods
 
@@ -91,6 +92,31 @@ and a boolean to check if the value has been set.
 
 SetMerchantid sets Merchantid field to given value.
 
+
+### GetNonce
+
+`func (o *DomainKeyRequest) GetNonce() string`
+
+GetNonce returns the Nonce field if non-nil, zero value otherwise.
+
+### GetNonceOk
+
+`func (o *DomainKeyRequest) GetNonceOk() (*string, bool)`
+
+GetNonceOk returns a tuple with the Nonce field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetNonce
+
+`func (o *DomainKeyRequest) SetNonce(v string)`
+
+SetNonce sets Nonce field to given value.
+
+### HasNonce
+
+`func (o *DomainKeyRequest) HasNonce() bool`
+
+HasNonce returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

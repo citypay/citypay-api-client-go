@@ -3,7 +3,7 @@ CityPay Payment API
 
  Welcome to the CityPay API, a robust HTTP API payment solution designed for seamless server-to-server  transactional processing. Our API facilitates a wide array of payment operations, catering to diverse business needs.  Whether you're integrating Internet payments, handling Mail Order/Telephone Order (MOTO) transactions, managing  Subscriptions with Recurring and Continuous Authority payments, or navigating the complexities of 3-D Secure  authentication, our API is equipped to support your requirements. Additionally, we offer functionalities for  Authorisation, Refunding, Pre-Authorisation, Cancellation/Voids, and Completion processing, alongside the capability  for tokenised payments.  ## Compliance and Security Overview <aside class=\"notice\">   Ensuring the security of payment transactions and compliance with industry standards is paramount. Our API is    designed with stringent security measures and compliance protocols to safeguard sensitive information and meet    the rigorous requirements of Visa, MasterCard, and the PCI Security Standards Council. </aside>  ### Key Compliance and Security Measures  * **TLS Encryption**: All data transmissions must utilise TLS version 1.2 or higher, employing [strong cryptography](#enabled-tls-ciphers). Our infrastructure strictly enforces this requirement to maintain the integrity and confidentiality of data in transit. We conduct regular scans and assessments of our TLS endpoints to identify and mitigate vulnerabilities. * **Data Storage Prohibitions**: Storing sensitive cardholder data (CHD), such as the card security code (CSC) or primary account number (PAN), is strictly prohibited. Our API is designed to minimize your exposure to sensitive data, thereby reducing your compliance burden. * **Data Masking**: For consumer protection and compliance, full card numbers must not be displayed on receipts or any customer-facing materials. Our API automatically masks PANs, displaying only the last four digits to facilitate safe receipt generation. * **Network Scans**: If your application is web-based, regular scans of your hosting environment are mandatory to identify and rectify potential vulnerabilities. This proactive measure is crucial for maintaining a secure and compliant online presence. * **PCI Compliance**: Adherence to PCI DSS standards is not optional; it's a requirement for operating securely and legally in the payments ecosystem. For detailed information on compliance requirements and resources, please visit the PCI Security Standards Council website [https://www.pcisecuritystandards.org/](https://www.pcisecuritystandards.org/). * **Request Validation**: Our API includes mechanisms to verify the legitimacy of each request, ensuring it pertains to a valid account and originates from a trusted source. We leverage remote IP address verification alongside sophisticated application firewall technologies to thwart a wide array of common security threats.  ## Getting Started Before integrating with the CityPay API, ensure your application and development practices align with the outlined compliance and security measures. This preparatory step is crucial for a smooth integration process and the long-term success of your payment processing operations.  For further details on API endpoints, request/response formats, and code examples, proceed to the subsequent sections of our documentation. Our aim is to provide you with all the necessary tools and information to integrate our payment processing capabilities seamlessly into your application.  Thank you for choosing CityPay API. We look forward to supporting your payment processing needs with our secure, compliant, and versatile API solution.
 
-API version: 6.6.40
+API version: 6.9.9
 Contact: support@citypay.com
 */
 
@@ -23,7 +23,7 @@ var _ MappedNullable = &PaylinkTokenCreated{}
 
 // PaylinkTokenCreated struct for PaylinkTokenCreated
 type PaylinkTokenCreated struct {
-	Attachments *PaylinkAttachmentResult `json:"attachments,omitempty"`
+	Attachments []PaylinkAttachmentResult `json:"attachments,omitempty"`
 	// true if BPS has been enabled on this token.
 	Bps *string `json:"bps,omitempty"`
 	// Date and time the token was generated.
@@ -33,6 +33,8 @@ type PaylinkTokenCreated struct {
 	Id string `json:"id"`
 	// The identifier as presented in the TokenRequest.
 	Identifier *string `json:"identifier,omitempty"`
+	// The merchant id of the token.
+	Merchantid *int32 `json:"merchantid,omitempty"`
 	// Determines whether the token is `live` or `test`.
 	Mode *string `json:"mode,omitempty"`
 	// A URL of a qrcode which can be used to refer to the token URL.
@@ -74,17 +76,17 @@ func NewPaylinkTokenCreatedWithDefaults() *PaylinkTokenCreated {
 }
 
 // GetAttachments returns the Attachments field value if set, zero value otherwise.
-func (o *PaylinkTokenCreated) GetAttachments() PaylinkAttachmentResult {
+func (o *PaylinkTokenCreated) GetAttachments() []PaylinkAttachmentResult {
 	if o == nil || IsNil(o.Attachments) {
-		var ret PaylinkAttachmentResult
+		var ret []PaylinkAttachmentResult
 		return ret
 	}
-	return *o.Attachments
+	return o.Attachments
 }
 
 // GetAttachmentsOk returns a tuple with the Attachments field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *PaylinkTokenCreated) GetAttachmentsOk() (*PaylinkAttachmentResult, bool) {
+func (o *PaylinkTokenCreated) GetAttachmentsOk() ([]PaylinkAttachmentResult, bool) {
 	if o == nil || IsNil(o.Attachments) {
 		return nil, false
 	}
@@ -100,9 +102,9 @@ func (o *PaylinkTokenCreated) HasAttachments() bool {
 	return false
 }
 
-// SetAttachments gets a reference to the given PaylinkAttachmentResult and assigns it to the Attachments field.
-func (o *PaylinkTokenCreated) SetAttachments(v PaylinkAttachmentResult) {
-	o.Attachments = &v
+// SetAttachments gets a reference to the given []PaylinkAttachmentResult and assigns it to the Attachments field.
+func (o *PaylinkTokenCreated) SetAttachments(v []PaylinkAttachmentResult) {
+	o.Attachments = v
 }
 
 // GetBps returns the Bps field value if set, zero value otherwise.
@@ -255,6 +257,38 @@ func (o *PaylinkTokenCreated) HasIdentifier() bool {
 // SetIdentifier gets a reference to the given string and assigns it to the Identifier field.
 func (o *PaylinkTokenCreated) SetIdentifier(v string) {
 	o.Identifier = &v
+}
+
+// GetMerchantid returns the Merchantid field value if set, zero value otherwise.
+func (o *PaylinkTokenCreated) GetMerchantid() int32 {
+	if o == nil || IsNil(o.Merchantid) {
+		var ret int32
+		return ret
+	}
+	return *o.Merchantid
+}
+
+// GetMerchantidOk returns a tuple with the Merchantid field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *PaylinkTokenCreated) GetMerchantidOk() (*int32, bool) {
+	if o == nil || IsNil(o.Merchantid) {
+		return nil, false
+	}
+	return o.Merchantid, true
+}
+
+// HasMerchantid returns a boolean if a field has been set.
+func (o *PaylinkTokenCreated) HasMerchantid() bool {
+	if o != nil && !IsNil(o.Merchantid) {
+		return true
+	}
+
+	return false
+}
+
+// SetMerchantid gets a reference to the given int32 and assigns it to the Merchantid field.
+func (o *PaylinkTokenCreated) SetMerchantid(v int32) {
+	o.Merchantid = &v
 }
 
 // GetMode returns the Mode field value if set, zero value otherwise.
@@ -522,6 +556,9 @@ func (o PaylinkTokenCreated) ToMap() (map[string]interface{}, error) {
 	toSerialize["id"] = o.Id
 	if !IsNil(o.Identifier) {
 		toSerialize["identifier"] = o.Identifier
+	}
+	if !IsNil(o.Merchantid) {
+		toSerialize["merchantid"] = o.Merchantid
 	}
 	if !IsNil(o.Mode) {
 		toSerialize["mode"] = o.Mode

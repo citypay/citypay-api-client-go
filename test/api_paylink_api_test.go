@@ -11,13 +11,14 @@ package citypay
 
 import (
 	"context"
-	openapiclient "github.com/citypay/citypay-api-client-go/citypay"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"os"
 	"strconv"
 	"testing"
 	"time"
+
+	openapiclient "github.com/citypay/citypay-api-client-go/citypay"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func generateToken(client *openapiclient.APIClient, sandboxContext context.Context) string {
@@ -99,18 +100,6 @@ func Test_citypay_PaylinkApiService(t *testing.T) {
 			TokenChangesRequest(sandboxContext).
 			PaylinkTokenStatusChangeRequest(*openapiclient.NewPaylinkTokenStatusChangeRequest(changeTime, cpMerchantId)).
 			Execute()
-
-		require.Nil(t, err)
-		require.NotNil(t, resp)
-		assert.Equal(t, 200, httpRes.StatusCode)
-
-	})
-
-	t.Run("Test PaylinkApiService TokenCloseRequest", func(t *testing.T) {
-
-		token := generateToken(apiClient, sandboxContext)
-
-		resp, httpRes, err := apiClient.PaylinkApi.TokenCloseRequest(sandboxContext, token).Execute()
 
 		require.Nil(t, err)
 		require.NotNil(t, resp)

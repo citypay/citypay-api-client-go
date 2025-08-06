@@ -9,6 +9,7 @@ Method | HTTP request | Description
 [**DomainKeyGenRequest**](OperationalFunctionsApi.md#DomainKeyGenRequest) | **Post** /dk/gen | Domain Key Generation Request
 [**ListMerchantsRequest**](OperationalFunctionsApi.md#ListMerchantsRequest) | **Get** /v6/merchants/{clientid} | List Merchants Request
 [**PingRequest**](OperationalFunctionsApi.md#PingRequest) | **Post** /v6/ping | Ping Request
+[**RegisterTempKey**](OperationalFunctionsApi.md#RegisterTempKey) | **Post** /v6/permissions/register-temp-ip | Register Temp Key
 
 
 
@@ -340,6 +341,72 @@ Name | Type | Description  | Notes
 
 - **Content-Type**: application/json, application/x-www-form-urlencoded, text/xml
 - **Accept**: application/x-www-form-urlencoded, application/json, text/xml
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## RegisterTempKey
+
+> Acknowledgement RegisterTempKey(ctx).RegisterIpModel(registerIpModel).Execute()
+
+Register Temp Key
+
+
+
+### Example
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/citypay/citypay-api-client-go/citypay"
+)
+
+func main() {
+	registerIpModel := *openapiclient.NewRegisterIpModel() // RegisterIpModel | 
+
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.OperationalFunctionsApi.RegisterTempKey(context.Background()).RegisterIpModel(registerIpModel).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `OperationalFunctionsApi.RegisterTempKey``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `RegisterTempKey`: Acknowledgement
+	fmt.Fprintf(os.Stdout, "Response from `OperationalFunctionsApi.RegisterTempKey`: %v\n", resp)
+}
+```
+
+### Path Parameters
+
+
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiRegisterTempKeyRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **registerIpModel** | [**RegisterIpModel**](RegisterIpModel.md) |  | 
+
+### Return type
+
+[**Acknowledgement**](Acknowledgement.md)
+
+### Authorization
+
+[cp-api-key](../README.md#cp-api-key)
+
+### HTTP request headers
+
+- **Content-Type**: application/json, text/xml
+- **Accept**: application/json, text/xml
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)

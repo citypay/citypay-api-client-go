@@ -2,11 +2,12 @@ package citypay
 
 import (
 	"encoding/json"
+	"testing"
+	"time"
+
 	openapiclient "github.com/citypay/citypay-api-client-go/citypay"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"testing"
-	"time"
 )
 
 var exampleTokenId = "id"
@@ -22,9 +23,9 @@ var exampleTokenSource = "1.1.1.1"
 var exampleTokenURL = "https://u"
 var exampleTokenUsc = "usc"
 
-func buildExampleAttachmentRes() openapiclient.PaylinkAttachmentResult {
+func buildExampleAttachmentRes() []openapiclient.PaylinkAttachmentResult {
 	a := openapiclient.NewPaylinkAttachmentResult("name", "OK")
-	return *a
+	return []openapiclient.PaylinkAttachmentResult{*a}
 }
 
 func buildExampleErrorCode() openapiclient.PaylinkErrorCode {

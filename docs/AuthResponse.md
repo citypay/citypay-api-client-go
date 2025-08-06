@@ -14,16 +14,19 @@ Name | Type | Description | Notes
 **BinCommercial** | Pointer to **bool** | Determines whether the bin range was found to be a commercial or business card. | [optional] 
 **BinDebit** | Pointer to **bool** | Determines whether the bin range was found to be a debit card. If false the card was considered as a credit card. | [optional] 
 **BinDescription** | Pointer to **string** | A description of the bin range found for the card. | [optional] 
-**Cavv** | Pointer to **string** | The cardholder authentication verification value which can be returned for verification purposes of the authenticated  transaction for dispute realisation.  | [optional] 
+**Cavv** | Pointer to **string** | The cardholder authentication verification value which can be returned for verification purposes of the authenticated  transaction for dispute realisation. The value is considered sensitive in the realm of PCI-3DS and is masked.  | [optional] 
 **Context** | Pointer to **string** | The context which processed the transaction, can be used for support purposes to trace transactions. | [optional] 
 **CscResult** | Pointer to **string** | The CSC result codes determine the result of checking the provided CSC value within the Card Security Code fraud system. If a transaction is declined due to the CSC code not matching, this value can help determine the reason for the decline.  &lt;table&gt; &lt;tr&gt; &lt;th&gt;Code&lt;/th&gt; &lt;th&gt;Description&lt;/th&gt; &lt;/tr&gt; &lt;tr&gt;&lt;td&gt; &lt;/td&gt;&lt;td&gt;No information&lt;/td&gt;&lt;/tr&gt; &lt;tr&gt;&lt;td&gt;M&lt;/td&gt;&lt;td&gt;Card verification data matches&lt;/td&gt;&lt;/tr&gt; &lt;tr&gt;&lt;td&gt;N&lt;/td&gt;&lt;td&gt;Card verification data was checked but did not match&lt;/td&gt;&lt;/tr&gt; &lt;tr&gt;&lt;td&gt;P&lt;/td&gt;&lt;td&gt;Card verification was not processed&lt;/td&gt;&lt;/tr&gt; &lt;tr&gt;&lt;td&gt;S&lt;/td&gt;&lt;td&gt;The card verification data should be on the card but the merchant indicates that it is not&lt;/td&gt;&lt;/tr&gt; &lt;tr&gt;&lt;td&gt;U&lt;/td&gt;&lt;td&gt;The card issuer is not certified&lt;/td&gt;&lt;/tr&gt; &lt;/table&gt;  | [optional] 
 **Currency** | Pointer to **string** | The currency the transaction was processed in. This is an &#x60;ISO4217&#x60; alpha currency value. | [optional] 
 **Datetime** | Pointer to **time.Time** | The UTC date time of the transaction in ISO data time format.  | [optional] 
 **Eci** | Pointer to **string** | An Electronic Commerce Indicator (ECI) used to identify the result of authentication using 3DSecure.  | [optional] 
+**ExternalRef** | Pointer to **string** | An external ref if supplied. | [optional] 
+**ExternalRefSource** | Pointer to **string** | An external ref source if supplied. | [optional] 
 **Identifier** | Pointer to **string** | The identifier provided within the request. | [optional] 
 **Live** | Pointer to **bool** | Used to identify that a transaction was processed on a live authorisation platform. | [optional] 
 **Maskedpan** | Pointer to **string** | A masked value of the card number used for processing displaying limited values that can be used on a receipt.  | [optional] 
 **Merchantid** | **int32** | The merchant id that processed this transaction. | 
+**PaymentIntentId** | Pointer to **string** | A payment intent id for the authorisation if it exists. | [optional] 
 **Result** | **int32** | An integer result that indicates the outcome of the transaction. The Code value below maps to the result value  &lt;table&gt; &lt;tr&gt; &lt;th&gt;Code&lt;/th&gt; &lt;th&gt;Abbrev&lt;/th&gt; &lt;th&gt;Description&lt;/th&gt; &lt;/tr&gt; &lt;tr&gt;&lt;td&gt;0&lt;/td&gt;&lt;td&gt;Declined&lt;/td&gt;&lt;td&gt;Declined&lt;/td&gt;&lt;/tr&gt; &lt;tr&gt;&lt;td&gt;1&lt;/td&gt;&lt;td&gt;Accepted&lt;/td&gt;&lt;td&gt;Accepted&lt;/td&gt;&lt;/tr&gt; &lt;tr&gt;&lt;td&gt;2&lt;/td&gt;&lt;td&gt;Rejected&lt;/td&gt;&lt;td&gt;Rejected&lt;/td&gt;&lt;/tr&gt; &lt;tr&gt;&lt;td&gt;3&lt;/td&gt;&lt;td&gt;Not Attempted&lt;/td&gt;&lt;td&gt;Not Attempted&lt;/td&gt;&lt;/tr&gt; &lt;tr&gt;&lt;td&gt;4&lt;/td&gt;&lt;td&gt;Referred&lt;/td&gt;&lt;td&gt;Referred&lt;/td&gt;&lt;/tr&gt; &lt;tr&gt;&lt;td&gt;5&lt;/td&gt;&lt;td&gt;PinRetry&lt;/td&gt;&lt;td&gt;Perform PIN Retry&lt;/td&gt;&lt;/tr&gt; &lt;tr&gt;&lt;td&gt;6&lt;/td&gt;&lt;td&gt;ForSigVer&lt;/td&gt;&lt;td&gt;Force Signature Verification&lt;/td&gt;&lt;/tr&gt; &lt;tr&gt;&lt;td&gt;7&lt;/td&gt;&lt;td&gt;Hold&lt;/td&gt;&lt;td&gt;Hold&lt;/td&gt;&lt;/tr&gt; &lt;tr&gt;&lt;td&gt;8&lt;/td&gt;&lt;td&gt;SecErr&lt;/td&gt;&lt;td&gt;Security Error&lt;/td&gt;&lt;/tr&gt; &lt;tr&gt;&lt;td&gt;9&lt;/td&gt;&lt;td&gt;CallAcq&lt;/td&gt;&lt;td&gt;Call Acquirer&lt;/td&gt;&lt;/tr&gt; &lt;tr&gt;&lt;td&gt;10&lt;/td&gt;&lt;td&gt;DNH&lt;/td&gt;&lt;td&gt;Do Not Honour&lt;/td&gt;&lt;/tr&gt; &lt;tr&gt;&lt;td&gt;11&lt;/td&gt;&lt;td&gt;RtnCrd&lt;/td&gt;&lt;td&gt;Retain Card&lt;/td&gt;&lt;/tr&gt; &lt;tr&gt;&lt;td&gt;12&lt;/td&gt;&lt;td&gt;ExprdCrd&lt;/td&gt;&lt;td&gt;Expired Card&lt;/td&gt;&lt;/tr&gt; &lt;tr&gt;&lt;td&gt;13&lt;/td&gt;&lt;td&gt;InvldCrd&lt;/td&gt;&lt;td&gt;Invalid Card No&lt;/td&gt;&lt;/tr&gt; &lt;tr&gt;&lt;td&gt;14&lt;/td&gt;&lt;td&gt;PinExcd&lt;/td&gt;&lt;td&gt;Pin Tries Exceeded&lt;/td&gt;&lt;/tr&gt; &lt;tr&gt;&lt;td&gt;15&lt;/td&gt;&lt;td&gt;PinInvld&lt;/td&gt;&lt;td&gt;Pin Invalid&lt;/td&gt;&lt;/tr&gt; &lt;tr&gt;&lt;td&gt;16&lt;/td&gt;&lt;td&gt;AuthReq&lt;/td&gt;&lt;td&gt;Authentication Required&lt;/td&gt;&lt;/tr&gt; &lt;tr&gt;&lt;td&gt;17&lt;/td&gt;&lt;td&gt;AuthenFail&lt;/td&gt;&lt;td&gt;Authentication Failed&lt;/td&gt;&lt;/tr&gt; &lt;tr&gt;&lt;td&gt;18&lt;/td&gt;&lt;td&gt;Verified&lt;/td&gt;&lt;td&gt;Card Verified&lt;/td&gt;&lt;/tr&gt; &lt;tr&gt;&lt;td&gt;19&lt;/td&gt;&lt;td&gt;Cancelled&lt;/td&gt;&lt;td&gt;Cancelled&lt;/td&gt;&lt;/tr&gt; &lt;tr&gt;&lt;td&gt;20&lt;/td&gt;&lt;td&gt;Un&lt;/td&gt;&lt;td&gt;Unknown&lt;/td&gt;&lt;/tr&gt; &lt;tr&gt;&lt;td&gt;21&lt;/td&gt;&lt;td&gt;Challenged&lt;/td&gt;&lt;td&gt;Challenged&lt;/td&gt;&lt;/tr&gt; &lt;tr&gt;&lt;td&gt;22&lt;/td&gt;&lt;td&gt;Decoupled&lt;/td&gt;&lt;td&gt;Decoupled&lt;/td&gt;&lt;/tr&gt; &lt;tr&gt;&lt;td&gt;23&lt;/td&gt;&lt;td&gt;Denied&lt;/td&gt;&lt;td&gt;Permission Denied&lt;/td&gt;&lt;/tr&gt; &lt;/table&gt;  | 
 **ResultCode** | **string** | The result code as defined in the Response Codes Reference for example 000 is an accepted live transaction whilst 001 is an accepted test transaction. Result codes identify the source of success and failure.  Codes may start with an alpha character i.e. C001 indicating a type of error such as a card validation error.  | 
 **ResultMessage** | **string** | The message regarding the result which provides further narrative to the result code.  | 
@@ -453,6 +456,56 @@ SetEci sets Eci field to given value.
 
 HasEci returns a boolean if a field has been set.
 
+### GetExternalRef
+
+`func (o *AuthResponse) GetExternalRef() string`
+
+GetExternalRef returns the ExternalRef field if non-nil, zero value otherwise.
+
+### GetExternalRefOk
+
+`func (o *AuthResponse) GetExternalRefOk() (*string, bool)`
+
+GetExternalRefOk returns a tuple with the ExternalRef field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetExternalRef
+
+`func (o *AuthResponse) SetExternalRef(v string)`
+
+SetExternalRef sets ExternalRef field to given value.
+
+### HasExternalRef
+
+`func (o *AuthResponse) HasExternalRef() bool`
+
+HasExternalRef returns a boolean if a field has been set.
+
+### GetExternalRefSource
+
+`func (o *AuthResponse) GetExternalRefSource() string`
+
+GetExternalRefSource returns the ExternalRefSource field if non-nil, zero value otherwise.
+
+### GetExternalRefSourceOk
+
+`func (o *AuthResponse) GetExternalRefSourceOk() (*string, bool)`
+
+GetExternalRefSourceOk returns a tuple with the ExternalRefSource field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetExternalRefSource
+
+`func (o *AuthResponse) SetExternalRefSource(v string)`
+
+SetExternalRefSource sets ExternalRefSource field to given value.
+
+### HasExternalRefSource
+
+`func (o *AuthResponse) HasExternalRefSource() bool`
+
+HasExternalRefSource returns a boolean if a field has been set.
+
 ### GetIdentifier
 
 `func (o *AuthResponse) GetIdentifier() string`
@@ -547,6 +600,31 @@ and a boolean to check if the value has been set.
 
 SetMerchantid sets Merchantid field to given value.
 
+
+### GetPaymentIntentId
+
+`func (o *AuthResponse) GetPaymentIntentId() string`
+
+GetPaymentIntentId returns the PaymentIntentId field if non-nil, zero value otherwise.
+
+### GetPaymentIntentIdOk
+
+`func (o *AuthResponse) GetPaymentIntentIdOk() (*string, bool)`
+
+GetPaymentIntentIdOk returns a tuple with the PaymentIntentId field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetPaymentIntentId
+
+`func (o *AuthResponse) SetPaymentIntentId(v string)`
+
+SetPaymentIntentId sets PaymentIntentId field to given value.
+
+### HasPaymentIntentId
+
+`func (o *AuthResponse) HasPaymentIntentId() bool`
+
+HasPaymentIntentId returns a boolean if a field has been set.
 
 ### GetResult
 
