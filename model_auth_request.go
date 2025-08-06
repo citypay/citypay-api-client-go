@@ -3,7 +3,7 @@ CityPay Payment API
 
  Welcome to the CityPay API, a robust HTTP API payment solution designed for seamless server-to-server  transactional processing. Our API facilitates a wide array of payment operations, catering to diverse business needs.  Whether you're integrating Internet payments, handling Mail Order/Telephone Order (MOTO) transactions, managing  Subscriptions with Recurring and Continuous Authority payments, or navigating the complexities of 3-D Secure  authentication, our API is equipped to support your requirements. Additionally, we offer functionalities for  Authorisation, Refunding, Pre-Authorisation, Cancellation/Voids, and Completion processing, alongside the capability  for tokenised payments.  ## Compliance and Security Overview <aside class=\"notice\">   Ensuring the security of payment transactions and compliance with industry standards is paramount. Our API is    designed with stringent security measures and compliance protocols to safeguard sensitive information and meet    the rigorous requirements of Visa, MasterCard, and the PCI Security Standards Council. </aside>  ### Key Compliance and Security Measures  * **TLS Encryption**: All data transmissions must utilise TLS version 1.2 or higher, employing [strong cryptography](#enabled-tls-ciphers). Our infrastructure strictly enforces this requirement to maintain the integrity and confidentiality of data in transit. We conduct regular scans and assessments of our TLS endpoints to identify and mitigate vulnerabilities. * **Data Storage Prohibitions**: Storing sensitive cardholder data (CHD), such as the card security code (CSC) or primary account number (PAN), is strictly prohibited. Our API is designed to minimize your exposure to sensitive data, thereby reducing your compliance burden. * **Data Masking**: For consumer protection and compliance, full card numbers must not be displayed on receipts or any customer-facing materials. Our API automatically masks PANs, displaying only the last four digits to facilitate safe receipt generation. * **Network Scans**: If your application is web-based, regular scans of your hosting environment are mandatory to identify and rectify potential vulnerabilities. This proactive measure is crucial for maintaining a secure and compliant online presence. * **PCI Compliance**: Adherence to PCI DSS standards is not optional; it's a requirement for operating securely and legally in the payments ecosystem. For detailed information on compliance requirements and resources, please visit the PCI Security Standards Council website [https://www.pcisecuritystandards.org/](https://www.pcisecuritystandards.org/). * **Request Validation**: Our API includes mechanisms to verify the legitimacy of each request, ensuring it pertains to a valid account and originates from a trusted source. We leverage remote IP address verification alongside sophisticated application firewall technologies to thwart a wide array of common security threats.  ## Getting Started Before integrating with the CityPay API, ensure your application and development practices align with the outlined compliance and security measures. This preparatory step is crucial for a smooth integration process and the long-term success of your payment processing operations.  For further details on API endpoints, request/response formats, and code examples, proceed to the subsequent sections of our documentation. Our aim is to provide you with all the necessary tools and information to integrate our payment processing capabilities seamlessly into your application.  Thank you for choosing CityPay API. We look forward to supporting your payment processing needs with our secure, compliant, and versatile API solution.
 
-API version: 6.6.40
+API version: 6.9.9
 Contact: support@citypay.com
 */
 
@@ -28,8 +28,12 @@ type AuthRequest struct {
 	// A policy value which determines whether an AVS postcode policy is enforced or bypassed.  Values are:   `0` for the default policy (default value if not supplied). Your default values are determined by your account manager on setup of the account.   `1` for an enforced policy. Transactions that are enforced will be rejected if the AVS postcode numeric value does not match.   `2` to bypass. Transactions that are bypassed will be allowed through even if the postcode did not match.   `3` to ignore. Transactions that are ignored will bypass the result and not send postcode details for authorisation.
 	AvsPostcodePolicy *string         `json:"avs_postcode_policy,omitempty"`
 	BillTo            *ContactDetails `json:"bill_to,omitempty"`
+	// Merchant-initiated transactions (MITs) are payments you trigger, where the cardholder has previously consented to you carrying out such payments. These may be scheduled (such as recurring payments and installments) or unscheduled (like account top-ups triggered by balance thresholds and no-show charges).  Scheduled These are regular payments using stored card details, like installments or a monthly subscription fee.  - `I` Instalment - A single purchase of goods or services billed to a cardholder in multiple transactions, over a period of time agreed by the cardholder and you.  - `R` Recurring - Transactions processed at fixed, regular intervals not to exceed one year between transactions, representing an agreement between a cardholder and you to purchase goods or services provided over a period of time.  Unscheduled These are payments using stored card details that do not occur on a regular schedule, like top-ups for a digital wallet triggered by the balance falling below a certain threshold.  - `A` Reauthorisation - a purchase made after the original purchase. A common scenario is delayed/split shipments.  - `C` Unscheduled Payment - A transaction using a stored credential for a fixed or variable amount that does not occur on a scheduled or regularly occurring transaction date. This includes account top-ups triggered by balance thresholds.  - `D` Delayed Charge - A delayed charge is typically used in hotel, cruise lines and vehicle rental environments to perform a supplemental account charge after original services are rendered.  - `L` Incremental - An incremental authorisation is typically found in hotel and car rental environments, where the cardholder has agreed to pay for any service incurred during the duration of the contract. An incremental authorisation is where you need to seek authorisation of further funds in addition to what you have originally requested. A common scenario is additional services charged to the contract, such as extending a stay in a hotel.  - `S` Resubmission - When the original purchase occurred, but you were not able to get authorisation at the time the goods or services were provided. It should be only used where the goods or services have already been provided, but the authorisation request is declined for insufficient funds.  - `X` No-show - A no-show is a transaction where you are enabled to charge for services which the cardholder entered into an agreement to purchase, but the cardholder did not meet the terms of the agreement.  - `N` Not Applicable - For all other transactions the value will be not applicable.
+	CardholderAgreement *string `json:"cardholder_agreement,omitempty"`
 	// The card number (PAN) with a variable length to a maximum of 21 digits in numerical form. Any non numeric characters will be stripped out of the card number, this includes whitespace or separators internal of the provided value.  The card number must be treated as sensitive data. We only provide an obfuscated value in logging and reporting.  The plaintext value is encrypted in our database using AES 256 GMC bit encryption for settlement or refund purposes.  When providing the card number to our gateway through the authorisation API you will be handling the card data on your application. This will require further PCI controls to be in place and this value must never be stored.
-	Cardnumber string `json:"cardnumber"`
+	Cardnumber *string `json:"cardnumber,omitempty"`
+	// The card token previously stored and created by the /tokenise route.
+	CpCardToken *string `json:"cp_card_token,omitempty"`
 	// The Card Security Code (CSC) (also known as CV2/CVV2) is normally found on the back of the card (American Express has it on the front). The value helps to identify possession of the card as it is not available within the chip or magnetic swipe.  When forwarding the CSC, please ensure the value is a string as some values start with 0 and this will be stripped out by any integer parsing.  The CSC number aids fraud prevention in Mail Order and Internet payments.  Business rules are available on your account to identify whether to accept or decline transactions based on mismatched results of the CSC.  The Payment Card Industry (PCI) requires that at no stage of a transaction should the CSC be stored.  This applies to all entities handling card data.  It should also not be used in any hashing process.  CityPay do not store the value and have no method of retrieving the value once the transaction has been processed. For this reason, duplicate checking is unable to determine the CSC in its duplication check algorithm.
 	Csc *string `json:"csc,omitempty"`
 	// A policy value which determines whether a CSC policy is enforced or bypassed.  Values are:   `0` for the default policy (default value if not supplied). Your default values are determined by your account manager on setup of the account.   `1` for an enforced policy. Transactions that are enforced will be rejected if the CSC value does not match.   `2` to bypass. Transactions that are bypassed will be allowed through even if the CSC did not match.   `3` to ignore. Transactions that are ignored will bypass the result and not send the CSC details for authorisation.
@@ -40,26 +44,36 @@ type AuthRequest struct {
 	DuplicatePolicy *string         `json:"duplicate_policy,omitempty"`
 	EventManagement *EventDataModel `json:"event_management,omitempty"`
 	// The month of expiry of the card. The month value should be a numerical value between 1 and 12.
-	Expmonth int32 `json:"expmonth"`
+	Expmonth *int32 `json:"expmonth,omitempty"`
 	// The year of expiry of the card.
-	Expyear     int32        `json:"expyear"`
+	Expyear     *int32       `json:"expyear,omitempty"`
 	ExternalMpi *ExternalMPI `json:"external_mpi,omitempty"`
 	// The identifier of the transaction to process. The value should be a valid reference and may be used to perform  post processing actions and to aid in reconciliation of transactions.  The value should be a valid printable string with ASCII character ranges from 0x32 to 0x127.  The identifier is recommended to be distinct for each transaction such as a [random unique identifier](https://en.wikipedia.org/wiki/Universally_unique_identifier) this will aid in ensuring each transaction is identifiable.  When transactions are processed they are also checked for duplicate requests. Changing the identifier on a subsequent request will ensure that a transaction is considered as different.
 	Identifier string `json:"identifier"`
+	// Transactions charged using the API are defined as:  **Cardholder Initiated**: A _cardholder initiated transaction_ (CIT) is where the cardholder selects the card for use for a purchase using previously stored details. An example would be a customer buying an item from your website after being present with their saved card details at checkout.  **Merchant Intiated**: A _merchant initiated transaction_ (MIT) is an authorisation initiated where you as the  merchant submit a cardholders previously stored details without the cardholder's participation. An example would  be a subscription to a membership scheme to debit their card monthly.  MITs have different reasons such as reauthorisation, delayed, unscheduled, incremental, recurring, instalment, no-show or resubmission.  The following values apply   - `M` - specifies that the transaction is initiated by the merchant   - `C` - specifies that the transaction is initiated by the cardholder  Where transactions are merchant initiated, a valid cardholder agreement must be defined.
+	Initiation *string `json:"initiation,omitempty"`
 	// A policy value which determines whether an AVS address policy is enforced, bypassed or ignored.  Values are:   `0` for the default policy (default value if not supplied). Your default values are determined by your account manager on setup of the account.   `1` for an enforced policy. Transactions that are enforced will be rejected if the AVS address numeric value does not match.   `2` to bypass. Transactions that are bypassed will be allowed through even if the address did not match.   `3` to ignore. Transactions that are ignored will bypass the result and not send address numeric details for authorisation.
 	MatchAvsa *string  `json:"match_avsa,omitempty"`
 	Mcc6012   *MCC6012 `json:"mcc6012,omitempty"`
 	// Identifies the merchant account to perform processing for.
 	Merchantid int32 `json:"merchantid"`
 	// The card holder name as appears on the card such as MR N E BODY. Required for some acquirers.
-	NameOnCard   *string         `json:"name_on_card,omitempty"`
-	ShipTo       *ContactDetails `json:"ship_to,omitempty"`
-	Tag          []string        `json:"tag,omitempty"`
-	Threedsecure *ThreeDSecure   `json:"threedsecure,omitempty"`
+	NameOnCard *string `json:"name_on_card,omitempty"`
+	// A payment intent id previously registered that this transaction is linked to.
+	PaymentIntentId *string `json:"payment_intent_id,omitempty"`
+	// A policy value which determines whether a pre auth policy is enforced or bypassed.  Values are:   `0` for the default policy (default value if not supplied). Your default values are determined by your account manager on setup of the account.   `1` for an enforced policy.  Enforces pre-authorisation when it does not pre-auth by default.   `2` to bypass. Bypasses pre-authorisation when it is enabled to pre auth by default.   `3` to ignore. The same as the default policy (0). Although it currently mirrors the default, this option is included for compatibility with other policies.
+	PreAuth *string         `json:"pre_auth,omitempty"`
+	ShipTo  *ContactDetails `json:"ship_to,omitempty"`
+	Tag     []string        `json:"tag,omitempty"`
+	// The threedsecure token generated by a call to /areq which may or may not be challenged.
+	ThreedsToken *string       `json:"threeds_token,omitempty"`
+	Threedsecure *ThreeDSecure `json:"threedsecure,omitempty"`
 	// Further information that can be added to the transaction will display in reporting. Can be used for flexible values such as operator id.
 	TransInfo *string `json:"trans_info,omitempty"`
 	// The type of transaction being submitted. Normally this value is not required and your account manager may request that you set this field.
 	TransType *string `json:"trans_type,omitempty"`
+	// A uuid for the session. The value tracks through 3ds session and therefore should be a valid v4 uuid.
+	Uuid *string `json:"uuid,omitempty"`
 }
 
 type _AuthRequest AuthRequest
@@ -68,12 +82,9 @@ type _AuthRequest AuthRequest
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewAuthRequest(amount int32, cardnumber string, expmonth int32, expyear int32, identifier string, merchantid int32) *AuthRequest {
+func NewAuthRequest(amount int32, identifier string, merchantid int32) *AuthRequest {
 	this := AuthRequest{}
 	this.Amount = amount
-	this.Cardnumber = cardnumber
-	this.Expmonth = expmonth
-	this.Expyear = expyear
 	this.Identifier = identifier
 	this.Merchantid = merchantid
 	return &this
@@ -207,28 +218,100 @@ func (o *AuthRequest) SetBillTo(v ContactDetails) {
 	o.BillTo = &v
 }
 
-// GetCardnumber returns the Cardnumber field value
-func (o *AuthRequest) GetCardnumber() string {
-	if o == nil {
+// GetCardholderAgreement returns the CardholderAgreement field value if set, zero value otherwise.
+func (o *AuthRequest) GetCardholderAgreement() string {
+	if o == nil || IsNil(o.CardholderAgreement) {
 		var ret string
 		return ret
 	}
-
-	return o.Cardnumber
+	return *o.CardholderAgreement
 }
 
-// GetCardnumberOk returns a tuple with the Cardnumber field value
+// GetCardholderAgreementOk returns a tuple with the CardholderAgreement field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *AuthRequest) GetCardnumberOk() (*string, bool) {
-	if o == nil {
+func (o *AuthRequest) GetCardholderAgreementOk() (*string, bool) {
+	if o == nil || IsNil(o.CardholderAgreement) {
 		return nil, false
 	}
-	return &o.Cardnumber, true
+	return o.CardholderAgreement, true
 }
 
-// SetCardnumber sets field value
+// HasCardholderAgreement returns a boolean if a field has been set.
+func (o *AuthRequest) HasCardholderAgreement() bool {
+	if o != nil && !IsNil(o.CardholderAgreement) {
+		return true
+	}
+
+	return false
+}
+
+// SetCardholderAgreement gets a reference to the given string and assigns it to the CardholderAgreement field.
+func (o *AuthRequest) SetCardholderAgreement(v string) {
+	o.CardholderAgreement = &v
+}
+
+// GetCardnumber returns the Cardnumber field value if set, zero value otherwise.
+func (o *AuthRequest) GetCardnumber() string {
+	if o == nil || IsNil(o.Cardnumber) {
+		var ret string
+		return ret
+	}
+	return *o.Cardnumber
+}
+
+// GetCardnumberOk returns a tuple with the Cardnumber field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *AuthRequest) GetCardnumberOk() (*string, bool) {
+	if o == nil || IsNil(o.Cardnumber) {
+		return nil, false
+	}
+	return o.Cardnumber, true
+}
+
+// HasCardnumber returns a boolean if a field has been set.
+func (o *AuthRequest) HasCardnumber() bool {
+	if o != nil && !IsNil(o.Cardnumber) {
+		return true
+	}
+
+	return false
+}
+
+// SetCardnumber gets a reference to the given string and assigns it to the Cardnumber field.
 func (o *AuthRequest) SetCardnumber(v string) {
-	o.Cardnumber = v
+	o.Cardnumber = &v
+}
+
+// GetCpCardToken returns the CpCardToken field value if set, zero value otherwise.
+func (o *AuthRequest) GetCpCardToken() string {
+	if o == nil || IsNil(o.CpCardToken) {
+		var ret string
+		return ret
+	}
+	return *o.CpCardToken
+}
+
+// GetCpCardTokenOk returns a tuple with the CpCardToken field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *AuthRequest) GetCpCardTokenOk() (*string, bool) {
+	if o == nil || IsNil(o.CpCardToken) {
+		return nil, false
+	}
+	return o.CpCardToken, true
+}
+
+// HasCpCardToken returns a boolean if a field has been set.
+func (o *AuthRequest) HasCpCardToken() bool {
+	if o != nil && !IsNil(o.CpCardToken) {
+		return true
+	}
+
+	return false
+}
+
+// SetCpCardToken gets a reference to the given string and assigns it to the CpCardToken field.
+func (o *AuthRequest) SetCpCardToken(v string) {
+	o.CpCardToken = &v
 }
 
 // GetCsc returns the Csc field value if set, zero value otherwise.
@@ -391,52 +474,68 @@ func (o *AuthRequest) SetEventManagement(v EventDataModel) {
 	o.EventManagement = &v
 }
 
-// GetExpmonth returns the Expmonth field value
+// GetExpmonth returns the Expmonth field value if set, zero value otherwise.
 func (o *AuthRequest) GetExpmonth() int32 {
-	if o == nil {
+	if o == nil || IsNil(o.Expmonth) {
 		var ret int32
 		return ret
 	}
-
-	return o.Expmonth
+	return *o.Expmonth
 }
 
-// GetExpmonthOk returns a tuple with the Expmonth field value
+// GetExpmonthOk returns a tuple with the Expmonth field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *AuthRequest) GetExpmonthOk() (*int32, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.Expmonth) {
 		return nil, false
 	}
-	return &o.Expmonth, true
+	return o.Expmonth, true
 }
 
-// SetExpmonth sets field value
+// HasExpmonth returns a boolean if a field has been set.
+func (o *AuthRequest) HasExpmonth() bool {
+	if o != nil && !IsNil(o.Expmonth) {
+		return true
+	}
+
+	return false
+}
+
+// SetExpmonth gets a reference to the given int32 and assigns it to the Expmonth field.
 func (o *AuthRequest) SetExpmonth(v int32) {
-	o.Expmonth = v
+	o.Expmonth = &v
 }
 
-// GetExpyear returns the Expyear field value
+// GetExpyear returns the Expyear field value if set, zero value otherwise.
 func (o *AuthRequest) GetExpyear() int32 {
-	if o == nil {
+	if o == nil || IsNil(o.Expyear) {
 		var ret int32
 		return ret
 	}
-
-	return o.Expyear
+	return *o.Expyear
 }
 
-// GetExpyearOk returns a tuple with the Expyear field value
+// GetExpyearOk returns a tuple with the Expyear field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *AuthRequest) GetExpyearOk() (*int32, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.Expyear) {
 		return nil, false
 	}
-	return &o.Expyear, true
+	return o.Expyear, true
 }
 
-// SetExpyear sets field value
+// HasExpyear returns a boolean if a field has been set.
+func (o *AuthRequest) HasExpyear() bool {
+	if o != nil && !IsNil(o.Expyear) {
+		return true
+	}
+
+	return false
+}
+
+// SetExpyear gets a reference to the given int32 and assigns it to the Expyear field.
 func (o *AuthRequest) SetExpyear(v int32) {
-	o.Expyear = v
+	o.Expyear = &v
 }
 
 // GetExternalMpi returns the ExternalMpi field value if set, zero value otherwise.
@@ -493,6 +592,38 @@ func (o *AuthRequest) GetIdentifierOk() (*string, bool) {
 // SetIdentifier sets field value
 func (o *AuthRequest) SetIdentifier(v string) {
 	o.Identifier = v
+}
+
+// GetInitiation returns the Initiation field value if set, zero value otherwise.
+func (o *AuthRequest) GetInitiation() string {
+	if o == nil || IsNil(o.Initiation) {
+		var ret string
+		return ret
+	}
+	return *o.Initiation
+}
+
+// GetInitiationOk returns a tuple with the Initiation field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *AuthRequest) GetInitiationOk() (*string, bool) {
+	if o == nil || IsNil(o.Initiation) {
+		return nil, false
+	}
+	return o.Initiation, true
+}
+
+// HasInitiation returns a boolean if a field has been set.
+func (o *AuthRequest) HasInitiation() bool {
+	if o != nil && !IsNil(o.Initiation) {
+		return true
+	}
+
+	return false
+}
+
+// SetInitiation gets a reference to the given string and assigns it to the Initiation field.
+func (o *AuthRequest) SetInitiation(v string) {
+	o.Initiation = &v
 }
 
 // GetMatchAvsa returns the MatchAvsa field value if set, zero value otherwise.
@@ -615,6 +746,70 @@ func (o *AuthRequest) SetNameOnCard(v string) {
 	o.NameOnCard = &v
 }
 
+// GetPaymentIntentId returns the PaymentIntentId field value if set, zero value otherwise.
+func (o *AuthRequest) GetPaymentIntentId() string {
+	if o == nil || IsNil(o.PaymentIntentId) {
+		var ret string
+		return ret
+	}
+	return *o.PaymentIntentId
+}
+
+// GetPaymentIntentIdOk returns a tuple with the PaymentIntentId field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *AuthRequest) GetPaymentIntentIdOk() (*string, bool) {
+	if o == nil || IsNil(o.PaymentIntentId) {
+		return nil, false
+	}
+	return o.PaymentIntentId, true
+}
+
+// HasPaymentIntentId returns a boolean if a field has been set.
+func (o *AuthRequest) HasPaymentIntentId() bool {
+	if o != nil && !IsNil(o.PaymentIntentId) {
+		return true
+	}
+
+	return false
+}
+
+// SetPaymentIntentId gets a reference to the given string and assigns it to the PaymentIntentId field.
+func (o *AuthRequest) SetPaymentIntentId(v string) {
+	o.PaymentIntentId = &v
+}
+
+// GetPreAuth returns the PreAuth field value if set, zero value otherwise.
+func (o *AuthRequest) GetPreAuth() string {
+	if o == nil || IsNil(o.PreAuth) {
+		var ret string
+		return ret
+	}
+	return *o.PreAuth
+}
+
+// GetPreAuthOk returns a tuple with the PreAuth field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *AuthRequest) GetPreAuthOk() (*string, bool) {
+	if o == nil || IsNil(o.PreAuth) {
+		return nil, false
+	}
+	return o.PreAuth, true
+}
+
+// HasPreAuth returns a boolean if a field has been set.
+func (o *AuthRequest) HasPreAuth() bool {
+	if o != nil && !IsNil(o.PreAuth) {
+		return true
+	}
+
+	return false
+}
+
+// SetPreAuth gets a reference to the given string and assigns it to the PreAuth field.
+func (o *AuthRequest) SetPreAuth(v string) {
+	o.PreAuth = &v
+}
+
 // GetShipTo returns the ShipTo field value if set, zero value otherwise.
 func (o *AuthRequest) GetShipTo() ContactDetails {
 	if o == nil || IsNil(o.ShipTo) {
@@ -677,6 +872,38 @@ func (o *AuthRequest) HasTag() bool {
 // SetTag gets a reference to the given []string and assigns it to the Tag field.
 func (o *AuthRequest) SetTag(v []string) {
 	o.Tag = v
+}
+
+// GetThreedsToken returns the ThreedsToken field value if set, zero value otherwise.
+func (o *AuthRequest) GetThreedsToken() string {
+	if o == nil || IsNil(o.ThreedsToken) {
+		var ret string
+		return ret
+	}
+	return *o.ThreedsToken
+}
+
+// GetThreedsTokenOk returns a tuple with the ThreedsToken field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *AuthRequest) GetThreedsTokenOk() (*string, bool) {
+	if o == nil || IsNil(o.ThreedsToken) {
+		return nil, false
+	}
+	return o.ThreedsToken, true
+}
+
+// HasThreedsToken returns a boolean if a field has been set.
+func (o *AuthRequest) HasThreedsToken() bool {
+	if o != nil && !IsNil(o.ThreedsToken) {
+		return true
+	}
+
+	return false
+}
+
+// SetThreedsToken gets a reference to the given string and assigns it to the ThreedsToken field.
+func (o *AuthRequest) SetThreedsToken(v string) {
+	o.ThreedsToken = &v
 }
 
 // GetThreedsecure returns the Threedsecure field value if set, zero value otherwise.
@@ -775,6 +1002,38 @@ func (o *AuthRequest) SetTransType(v string) {
 	o.TransType = &v
 }
 
+// GetUuid returns the Uuid field value if set, zero value otherwise.
+func (o *AuthRequest) GetUuid() string {
+	if o == nil || IsNil(o.Uuid) {
+		var ret string
+		return ret
+	}
+	return *o.Uuid
+}
+
+// GetUuidOk returns a tuple with the Uuid field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *AuthRequest) GetUuidOk() (*string, bool) {
+	if o == nil || IsNil(o.Uuid) {
+		return nil, false
+	}
+	return o.Uuid, true
+}
+
+// HasUuid returns a boolean if a field has been set.
+func (o *AuthRequest) HasUuid() bool {
+	if o != nil && !IsNil(o.Uuid) {
+		return true
+	}
+
+	return false
+}
+
+// SetUuid gets a reference to the given string and assigns it to the Uuid field.
+func (o *AuthRequest) SetUuid(v string) {
+	o.Uuid = &v
+}
+
 func (o AuthRequest) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -795,7 +1054,15 @@ func (o AuthRequest) ToMap() (map[string]interface{}, error) {
 	if !IsNil(o.BillTo) {
 		toSerialize["bill_to"] = o.BillTo
 	}
-	toSerialize["cardnumber"] = o.Cardnumber
+	if !IsNil(o.CardholderAgreement) {
+		toSerialize["cardholder_agreement"] = o.CardholderAgreement
+	}
+	if !IsNil(o.Cardnumber) {
+		toSerialize["cardnumber"] = o.Cardnumber
+	}
+	if !IsNil(o.CpCardToken) {
+		toSerialize["cp_card_token"] = o.CpCardToken
+	}
 	if !IsNil(o.Csc) {
 		toSerialize["csc"] = o.Csc
 	}
@@ -811,12 +1078,19 @@ func (o AuthRequest) ToMap() (map[string]interface{}, error) {
 	if !IsNil(o.EventManagement) {
 		toSerialize["event_management"] = o.EventManagement
 	}
-	toSerialize["expmonth"] = o.Expmonth
-	toSerialize["expyear"] = o.Expyear
+	if !IsNil(o.Expmonth) {
+		toSerialize["expmonth"] = o.Expmonth
+	}
+	if !IsNil(o.Expyear) {
+		toSerialize["expyear"] = o.Expyear
+	}
 	if !IsNil(o.ExternalMpi) {
 		toSerialize["external_mpi"] = o.ExternalMpi
 	}
 	toSerialize["identifier"] = o.Identifier
+	if !IsNil(o.Initiation) {
+		toSerialize["initiation"] = o.Initiation
+	}
 	if !IsNil(o.MatchAvsa) {
 		toSerialize["match_avsa"] = o.MatchAvsa
 	}
@@ -827,11 +1101,20 @@ func (o AuthRequest) ToMap() (map[string]interface{}, error) {
 	if !IsNil(o.NameOnCard) {
 		toSerialize["name_on_card"] = o.NameOnCard
 	}
+	if !IsNil(o.PaymentIntentId) {
+		toSerialize["payment_intent_id"] = o.PaymentIntentId
+	}
+	if !IsNil(o.PreAuth) {
+		toSerialize["pre_auth"] = o.PreAuth
+	}
 	if !IsNil(o.ShipTo) {
 		toSerialize["ship_to"] = o.ShipTo
 	}
 	if !IsNil(o.Tag) {
 		toSerialize["tag"] = o.Tag
+	}
+	if !IsNil(o.ThreedsToken) {
+		toSerialize["threeds_token"] = o.ThreedsToken
 	}
 	if !IsNil(o.Threedsecure) {
 		toSerialize["threedsecure"] = o.Threedsecure
@@ -842,6 +1125,9 @@ func (o AuthRequest) ToMap() (map[string]interface{}, error) {
 	if !IsNil(o.TransType) {
 		toSerialize["trans_type"] = o.TransType
 	}
+	if !IsNil(o.Uuid) {
+		toSerialize["uuid"] = o.Uuid
+	}
 	return toSerialize, nil
 }
 
@@ -851,9 +1137,6 @@ func (o *AuthRequest) UnmarshalJSON(data []byte) (err error) {
 	// that every required field exists as a key in the generic map.
 	requiredProperties := []string{
 		"amount",
-		"cardnumber",
-		"expmonth",
-		"expyear",
 		"identifier",
 		"merchantid",
 	}

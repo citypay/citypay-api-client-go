@@ -4,12 +4,13 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Attachments** | Pointer to [**PaylinkAttachmentResult**](PaylinkAttachmentResult.md) |  | [optional] 
+**Attachments** | Pointer to [**[]PaylinkAttachmentResult**](PaylinkAttachmentResult.md) |  | [optional] 
 **Bps** | Pointer to **string** | true if BPS has been enabled on this token. | [optional] 
 **DateCreated** | Pointer to **time.Time** | Date and time the token was generated. | [optional] 
 **Errors** | Pointer to [**[]PaylinkErrorCode**](PaylinkErrorCode.md) |  | [optional] 
 **Id** | **string** | A unique id of the request. | 
 **Identifier** | Pointer to **string** | The identifier as presented in the TokenRequest. | [optional] 
+**Merchantid** | Pointer to **int32** | The merchant id of the token. | [optional] 
 **Mode** | Pointer to **string** | Determines whether the token is &#x60;live&#x60; or &#x60;test&#x60;. | [optional] 
 **Qrcode** | Pointer to **string** | A URL of a qrcode which can be used to refer to the token URL. | [optional] 
 **Result** | **int32** | The result field contains the result for the Paylink Token Request. 0 - indicates that an error was encountered while creating the token. 1 - which indicates that a Token was successfully created. | 
@@ -40,20 +41,20 @@ but it doesn't guarantee that properties required by API are set
 
 ### GetAttachments
 
-`func (o *PaylinkTokenCreated) GetAttachments() PaylinkAttachmentResult`
+`func (o *PaylinkTokenCreated) GetAttachments() []PaylinkAttachmentResult`
 
 GetAttachments returns the Attachments field if non-nil, zero value otherwise.
 
 ### GetAttachmentsOk
 
-`func (o *PaylinkTokenCreated) GetAttachmentsOk() (*PaylinkAttachmentResult, bool)`
+`func (o *PaylinkTokenCreated) GetAttachmentsOk() (*[]PaylinkAttachmentResult, bool)`
 
 GetAttachmentsOk returns a tuple with the Attachments field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetAttachments
 
-`func (o *PaylinkTokenCreated) SetAttachments(v PaylinkAttachmentResult)`
+`func (o *PaylinkTokenCreated) SetAttachments(v []PaylinkAttachmentResult)`
 
 SetAttachments sets Attachments field to given value.
 
@@ -182,6 +183,31 @@ SetIdentifier sets Identifier field to given value.
 `func (o *PaylinkTokenCreated) HasIdentifier() bool`
 
 HasIdentifier returns a boolean if a field has been set.
+
+### GetMerchantid
+
+`func (o *PaylinkTokenCreated) GetMerchantid() int32`
+
+GetMerchantid returns the Merchantid field if non-nil, zero value otherwise.
+
+### GetMerchantidOk
+
+`func (o *PaylinkTokenCreated) GetMerchantidOk() (*int32, bool)`
+
+GetMerchantidOk returns a tuple with the Merchantid field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetMerchantid
+
+`func (o *PaylinkTokenCreated) SetMerchantid(v int32)`
+
+SetMerchantid sets Merchantid field to given value.
+
+### HasMerchantid
+
+`func (o *PaylinkTokenCreated) HasMerchantid() bool`
+
+HasMerchantid returns a boolean if a field has been set.
 
 ### GetMode
 

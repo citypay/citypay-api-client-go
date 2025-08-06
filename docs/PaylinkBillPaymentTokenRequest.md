@@ -5,6 +5,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Addressee** | Pointer to **string** | Who the bill payment request intended for. This should be a readable name such as a person or company. | [optional] 
+**Adjustments** | Pointer to [**Adjustments**](Adjustments.md) |  | [optional] 
 **Attachments** | Pointer to [**[]PaylinkAttachmentRequest**](PaylinkAttachmentRequest.md) |  | [optional] 
 **Descriptor** | Pointer to **string** | A descriptor for the bill payment used to describe what the payment request is for for instance \&quot;Invoice\&quot;.  The descriptor can be used as descriptive text on emails or the payment page. For instance an invoice may have a button saying \&quot;View Invoice\&quot; or an email may say \&quot;to pay your Invoice online\&quot;.  | [optional] 
 **Due** | Pointer to **string** | A date that the invoice is due. This can be displayed on the payment page. | [optional] 
@@ -56,6 +57,31 @@ SetAddressee sets Addressee field to given value.
 `func (o *PaylinkBillPaymentTokenRequest) HasAddressee() bool`
 
 HasAddressee returns a boolean if a field has been set.
+
+### GetAdjustments
+
+`func (o *PaylinkBillPaymentTokenRequest) GetAdjustments() Adjustments`
+
+GetAdjustments returns the Adjustments field if non-nil, zero value otherwise.
+
+### GetAdjustmentsOk
+
+`func (o *PaylinkBillPaymentTokenRequest) GetAdjustmentsOk() (*Adjustments, bool)`
+
+GetAdjustmentsOk returns a tuple with the Adjustments field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetAdjustments
+
+`func (o *PaylinkBillPaymentTokenRequest) SetAdjustments(v Adjustments)`
+
+SetAdjustments sets Adjustments field to given value.
+
+### HasAdjustments
+
+`func (o *PaylinkBillPaymentTokenRequest) HasAdjustments() bool`
+
+HasAdjustments returns a boolean if a field has been set.
 
 ### GetAttachments
 

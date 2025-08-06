@@ -181,7 +181,7 @@ import (
 )
 
 func main() {
-	directPostRequest := *openapiclient.NewDirectPostRequest(int32(19995), "4000 0000 0000 0002", int32(9), int32(2027), "95b857a1-5955-4b86-963c-5a6dbfc4fb95", "3896FBC43674AF59478DAF7F546FA4D4CB89981A936E6AAE997E43B55DF6C39D") // DirectPostRequest | 
+	directPostRequest := *openapiclient.NewDirectPostRequest(int32(19995), "95b857a1-5955-4b86-963c-5a6dbfc4fb95", "3896FBC43674AF59478DAF7F546FA4D4CB89981A936E6AAE997E43B55DF6C39D") // DirectPostRequest | 
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
@@ -247,7 +247,7 @@ import (
 )
 
 func main() {
-	directPostRequest := *openapiclient.NewDirectPostRequest(int32(19995), "4000 0000 0000 0002", int32(9), int32(2027), "95b857a1-5955-4b86-963c-5a6dbfc4fb95", "3896FBC43674AF59478DAF7F546FA4D4CB89981A936E6AAE997E43B55DF6C39D") // DirectPostRequest | 
+	directPostRequest := *openapiclient.NewDirectPostRequest(int32(19995), "95b857a1-5955-4b86-963c-5a6dbfc4fb95", "3896FBC43674AF59478DAF7F546FA4D4CB89981A936E6AAE997E43B55DF6C39D") // DirectPostRequest | 
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)

@@ -4,14 +4,15 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**AcsMode** | Pointer to **string** | Specifies the approach to be adopted by the Paylink form when displaying a 3-D Secure challenge window. The values may be  iframe: shows the 3-D Secure ACS in an iframe dialog, neatly embedding it in Paylink. This provides a more seamless flow for the cardholder who is able to validate and authenticate their card using a dialog provided by their card issuer.  inline: an inline mode transfers the full browser window to the authentication server, allowing the payment cardholder to see their payment card issuer&#39;s URL and the certificate status in the browser. If you request an iframe mode and the browser width is deemed as being small (&lt; 768px) then an inline mode will be enforced. This is to ensure that mobile users have an improved user experience.  | [optional] 
+**AcsMode** | Pointer to **string** | Specifies the approach to be adopted by the Paylink form when displaying a 3-D Secure challenge window. The values may be   - &#x60;iframe&#x60; shows the 3-D Secure ACS in an iframe dialog, neatly embedding it in Paylink. This provides a more seamless flow for the cardholder who is able to validate and authenticate their card using a dialog provided by their card issuer.  - &#x60;inline&#x60; an inline mode transfers the full browser window to the authentication server, allowing the payment cardholder to see their payment card issuer&#39;s URL and the certificate status in the browser.  If you request an iframe mode and the browser width is deemed as being small (&lt; 768px) then an inline mode will be enforced. This is to ensure that mobile users have an appropriate user experience.  The default type if not supplied is **iframe**.  | [optional] 
 **CustomParams** | Pointer to [**[]PaylinkCustomParam**](PaylinkCustomParam.md) |  | [optional] 
 **Descriptor** | Pointer to **string** | Directly specify the merchant descriptor used for the transaction to be displayed on the payment page. | [optional] 
-**ExpireIn** | Pointer to **string** | Specifies a period of time in seconds after which the token cannot be used. A value of 0 defines that the token will never expire. The API will convert an expiry time based on a string value. For instance:   s - Time in seconds, for example 90s.   m - Time in minutes, for example 20m.   h - Time in hours, for example 4h.   w - Time in weeks, for example 4w.   M - Time in months, for example 6M.   y - Time in years, for example 1y.   Defaults to 30 minutes.  | [optional] 
+**ExpireIn** | Pointer to **string** | Specifies a period of time in seconds after which the token cannot be used. A value of 0 defines that the token will never expire. The API will convert an expiry time based on a string value.  For instance: -  s - Time in seconds, for example 90s. -  m - Time in minutes, for example 20m. -  h - Time in hours, for example 4h. -  w - Time in weeks, for example 4w. -  M - Time in months, for example 6M. -  y - Time in years, for example 1y. -  Defaults to 30 minutes.  | [optional] 
 **FieldGuard** | Pointer to [**[]PaylinkFieldGuardModel**](PaylinkFieldGuardModel.md) |  | [optional] 
 **LockParams** | Pointer to **[]string** |  | [optional] 
 **MerchLogo** | Pointer to **string** | A URL of a logo to include in the form. The URL should be delivered using HTTPS. | [optional] 
 **MerchTerms** | Pointer to **string** | A URL of the merchant terms and conditions for payment. If a value is supplied, a checkbox will be required to be completed to confirm that the cardholder agrees to these conditions before payment. A modal dialogue is displayed with the content of the conditions displayed. | [optional] 
+**MetaData** | Pointer to **map[string]string** |  | [optional] 
 **Options** | Pointer to **[]string** |  | [optional] 
 **PartPayments** | Pointer to [**PaylinkPartPayments**](PaylinkPartPayments.md) |  | [optional] 
 **PassThroughData** | Pointer to **map[string]string** |  | [optional] 
@@ -245,6 +246,31 @@ SetMerchTerms sets MerchTerms field to given value.
 `func (o *PaylinkConfig) HasMerchTerms() bool`
 
 HasMerchTerms returns a boolean if a field has been set.
+
+### GetMetaData
+
+`func (o *PaylinkConfig) GetMetaData() map[string]string`
+
+GetMetaData returns the MetaData field if non-nil, zero value otherwise.
+
+### GetMetaDataOk
+
+`func (o *PaylinkConfig) GetMetaDataOk() (*map[string]string, bool)`
+
+GetMetaDataOk returns a tuple with the MetaData field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetMetaData
+
+`func (o *PaylinkConfig) SetMetaData(v map[string]string)`
+
+SetMetaData sets MetaData field to given value.
+
+### HasMetaData
+
+`func (o *PaylinkConfig) HasMetaData() bool`
+
+HasMetaData returns a boolean if a field has been set.
 
 ### GetOptions
 

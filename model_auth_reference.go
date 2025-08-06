@@ -3,7 +3,7 @@ CityPay Payment API
 
  Welcome to the CityPay API, a robust HTTP API payment solution designed for seamless server-to-server  transactional processing. Our API facilitates a wide array of payment operations, catering to diverse business needs.  Whether you're integrating Internet payments, handling Mail Order/Telephone Order (MOTO) transactions, managing  Subscriptions with Recurring and Continuous Authority payments, or navigating the complexities of 3-D Secure  authentication, our API is equipped to support your requirements. Additionally, we offer functionalities for  Authorisation, Refunding, Pre-Authorisation, Cancellation/Voids, and Completion processing, alongside the capability  for tokenised payments.  ## Compliance and Security Overview <aside class=\"notice\">   Ensuring the security of payment transactions and compliance with industry standards is paramount. Our API is    designed with stringent security measures and compliance protocols to safeguard sensitive information and meet    the rigorous requirements of Visa, MasterCard, and the PCI Security Standards Council. </aside>  ### Key Compliance and Security Measures  * **TLS Encryption**: All data transmissions must utilise TLS version 1.2 or higher, employing [strong cryptography](#enabled-tls-ciphers). Our infrastructure strictly enforces this requirement to maintain the integrity and confidentiality of data in transit. We conduct regular scans and assessments of our TLS endpoints to identify and mitigate vulnerabilities. * **Data Storage Prohibitions**: Storing sensitive cardholder data (CHD), such as the card security code (CSC) or primary account number (PAN), is strictly prohibited. Our API is designed to minimize your exposure to sensitive data, thereby reducing your compliance burden. * **Data Masking**: For consumer protection and compliance, full card numbers must not be displayed on receipts or any customer-facing materials. Our API automatically masks PANs, displaying only the last four digits to facilitate safe receipt generation. * **Network Scans**: If your application is web-based, regular scans of your hosting environment are mandatory to identify and rectify potential vulnerabilities. This proactive measure is crucial for maintaining a secure and compliant online presence. * **PCI Compliance**: Adherence to PCI DSS standards is not optional; it's a requirement for operating securely and legally in the payments ecosystem. For detailed information on compliance requirements and resources, please visit the PCI Security Standards Council website [https://www.pcisecuritystandards.org/](https://www.pcisecuritystandards.org/). * **Request Validation**: Our API includes mechanisms to verify the legitimacy of each request, ensuring it pertains to a valid account and originates from a trusted source. We leverage remote IP address verification alongside sophisticated application firewall technologies to thwart a wide array of common security threats.  ## Getting Started Before integrating with the CityPay API, ensure your application and development practices align with the outlined compliance and security measures. This preparatory step is crucial for a smooth integration process and the long-term success of your payment processing operations.  For further details on API endpoints, request/response formats, and code examples, proceed to the subsequent sections of our documentation. Our aim is to provide you with all the necessary tools and information to integrate our payment processing capabilities seamlessly into your application.  Thank you for choosing CityPay API. We look forward to supporting your payment processing needs with our secure, compliant, and versatile API solution.
 
-API version: 6.6.40
+API version: 6.9.9
 Contact: support@citypay.com
 */
 
@@ -21,6 +21,8 @@ var _ MappedNullable = &AuthReference{}
 
 // AuthReference struct for AuthReference
 type AuthReference struct {
+	// The address of the card holder.
+	Address *string `json:"address,omitempty"`
 	// The amount of the transaction in decimal currency format.
 	Amount *string `json:"amount,omitempty"`
 	// The amount of the transaction in integer/request format.
@@ -29,26 +31,65 @@ type AuthReference struct {
 	Atrn *string `json:"atrn,omitempty"`
 	// The authorisation code of the transaction returned by the acquirer or card issuer.
 	Authcode *string `json:"authcode,omitempty"`
+	// The authentication result if an ecommerce transaction. 'Y'. Authentication Successful, 'N'. Authentication Failed, 'A'. Attempts Processing Performed, 'U'. Authentication Could Not Be Performed, 'C'. Challenge Required.
+	AuthenResult *string `json:"authen_result,omitempty"`
 	// A batch number which the transaction has been end of day batched towards.
 	Batchno *string `json:"batchno,omitempty"`
+	// Whether the card is a commercial card.
+	BinCommercial *bool `json:"bin_commercial,omitempty"`
+	// Whether the card is a consumer card.
+	BinConsumer *bool `json:"bin_consumer,omitempty"`
+	// Whether the card is a corporate card.
+	BinCorporate *bool `json:"bin_corporate,omitempty"`
+	// Whether the card is a credit card.
+	BinCredit *bool `json:"bin_credit,omitempty"`
+	// Whether the card is a debit card.
+	BinDebit *bool `json:"bin_debit,omitempty"`
+	// Merchant-initiated transactions (MITs) are payments you trigger, where the cardholder has previously consented to you carrying out such payments. These may be scheduled (such as recurring payments and installments) or unscheduled (like account top-ups triggered by balance thresholds and no-show charges).  Scheduled These are regular payments using stored card details, like installments or a monthly subscription fee.  - `I` Instalment - A single purchase of goods or services billed to a cardholder in multiple transactions, over a period of time agreed by the cardholder and you.  - `R` Recurring - Transactions processed at fixed, regular intervals not to exceed one year between transactions, representing an agreement between a cardholder and you to purchase goods or services provided over a period of time.  Unscheduled These are payments using stored card details that do not occur on a regular schedule, like top-ups for a digital wallet triggered by the balance falling below a certain threshold.  - `A` Reauthorisation - a purchase made after the original purchase. A common scenario is delayed/split shipments.  - `C` Unscheduled Payment - A transaction using a stored credential for a fixed or variable amount that does not occur on a scheduled or regularly occurring transaction date. This includes account top-ups triggered by balance thresholds.  - `D` Delayed Charge - A delayed charge is typically used in hotel, cruise lines and vehicle rental environments to perform a supplemental account charge after original services are rendered.  - `L` Incremental - An incremental authorisation is typically found in hotel and car rental environments, where the cardholder has agreed to pay for any service incurred during the duration of the contract. An incremental authorisation is where you need to seek authorisation of further funds in addition to what you have originally requested. A common scenario is additional services charged to the contract, such as extending a stay in a hotel.  - `S` Resubmission - When the original purchase occurred, but you were not able to get authorisation at the time the goods or services were provided. It should be only used where the goods or services have already been provided, but the authorisation request is declined for insufficient funds.  - `X` No-show - A no-show is a transaction where you are enabled to charge for services which the cardholder entered into an agreement to purchase, but the cardholder did not meet the terms of the agreement.  - `N` Not Applicable - For all other transactions the value will be not applicable.
+	CardholderAgreement *string `json:"cardholder_agreement,omitempty"`
 	// The currency of the transaction in ISO 4217 code format.
 	Currency *string `json:"currency,omitempty"`
 	// The date and time of the transaction.
 	Datetime *time.Time `json:"datetime,omitempty"`
+	// The ECI if an ecommerce transaction.
+	Eci *string `json:"eci,omitempty"`
+	// The email address of the card holder.
+	Email *string `json:"email,omitempty"`
+	// The environment that the transaction is process within based on the transaction type.
+	Env *string `json:"env,omitempty"`
 	// The identifier of the transaction used to process the transaction.
 	Identifier *string `json:"identifier,omitempty"`
+	// The initiation of the payment. The value will be C for Card holder initiated and M for a merchant initiated transaction.
+	Initiation *string `json:"initiation,omitempty"`
+	// The payment instrument used such as Card, Cash, Bank, Crypto, ApplePay, GooglePay, Click2Pay, PayPal, OpenBankingPayment.
+	Instrument *string `json:"instrument,omitempty"`
 	// A masking of the card number which was used to process the tranasction.
 	Maskedpan *string `json:"maskedpan,omitempty"`
 	// The merchant id of the transaction result.
-	Merchantid *int32 `json:"merchantid,omitempty"`
+	Merchantid *int32             `json:"merchantid,omitempty"`
+	Meta       *map[string]string `json:"meta,omitempty"`
+	// The name of the card holder.
+	NameOnCard *string `json:"name_on_card,omitempty"`
+	// The postcode of the card holder.
+	Postcode *string `json:"postcode,omitempty"`
 	// The result of the transaction.
 	Result *string `json:"result,omitempty"`
+	// The id of the result of the transaction.
+	ResultId *string `json:"result_id,omitempty"`
+	// The card scheme of any card used.
+	Scheme *string `json:"scheme,omitempty"`
+	// The card scheme logo of any card used.
+	SchemeLogo *string `json:"scheme_logo,omitempty"`
 	// The current status of the transaction through it's lifecycle.
 	TransStatus *string `json:"trans_status,omitempty"`
-	// The type of transaction that was processed.
+	// The type code of transaction that was processed.
 	TransType *string `json:"trans_type,omitempty"`
 	// The transaction number of the transaction.
 	Transno *int32 `json:"transno,omitempty"`
+	// Defines whether the transaction is a sale, refund or verification.
+	Type *string `json:"type,omitempty"`
+	// The date and time of the transaction in UTC milli seconds since the epoc.
+	Utc *int64 `json:"utc,omitempty"`
 }
 
 // NewAuthReference instantiates a new AuthReference object
@@ -66,6 +107,38 @@ func NewAuthReference() *AuthReference {
 func NewAuthReferenceWithDefaults() *AuthReference {
 	this := AuthReference{}
 	return &this
+}
+
+// GetAddress returns the Address field value if set, zero value otherwise.
+func (o *AuthReference) GetAddress() string {
+	if o == nil || IsNil(o.Address) {
+		var ret string
+		return ret
+	}
+	return *o.Address
+}
+
+// GetAddressOk returns a tuple with the Address field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *AuthReference) GetAddressOk() (*string, bool) {
+	if o == nil || IsNil(o.Address) {
+		return nil, false
+	}
+	return o.Address, true
+}
+
+// HasAddress returns a boolean if a field has been set.
+func (o *AuthReference) HasAddress() bool {
+	if o != nil && !IsNil(o.Address) {
+		return true
+	}
+
+	return false
+}
+
+// SetAddress gets a reference to the given string and assigns it to the Address field.
+func (o *AuthReference) SetAddress(v string) {
+	o.Address = &v
 }
 
 // GetAmount returns the Amount field value if set, zero value otherwise.
@@ -196,6 +269,38 @@ func (o *AuthReference) SetAuthcode(v string) {
 	o.Authcode = &v
 }
 
+// GetAuthenResult returns the AuthenResult field value if set, zero value otherwise.
+func (o *AuthReference) GetAuthenResult() string {
+	if o == nil || IsNil(o.AuthenResult) {
+		var ret string
+		return ret
+	}
+	return *o.AuthenResult
+}
+
+// GetAuthenResultOk returns a tuple with the AuthenResult field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *AuthReference) GetAuthenResultOk() (*string, bool) {
+	if o == nil || IsNil(o.AuthenResult) {
+		return nil, false
+	}
+	return o.AuthenResult, true
+}
+
+// HasAuthenResult returns a boolean if a field has been set.
+func (o *AuthReference) HasAuthenResult() bool {
+	if o != nil && !IsNil(o.AuthenResult) {
+		return true
+	}
+
+	return false
+}
+
+// SetAuthenResult gets a reference to the given string and assigns it to the AuthenResult field.
+func (o *AuthReference) SetAuthenResult(v string) {
+	o.AuthenResult = &v
+}
+
 // GetBatchno returns the Batchno field value if set, zero value otherwise.
 func (o *AuthReference) GetBatchno() string {
 	if o == nil || IsNil(o.Batchno) {
@@ -226,6 +331,198 @@ func (o *AuthReference) HasBatchno() bool {
 // SetBatchno gets a reference to the given string and assigns it to the Batchno field.
 func (o *AuthReference) SetBatchno(v string) {
 	o.Batchno = &v
+}
+
+// GetBinCommercial returns the BinCommercial field value if set, zero value otherwise.
+func (o *AuthReference) GetBinCommercial() bool {
+	if o == nil || IsNil(o.BinCommercial) {
+		var ret bool
+		return ret
+	}
+	return *o.BinCommercial
+}
+
+// GetBinCommercialOk returns a tuple with the BinCommercial field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *AuthReference) GetBinCommercialOk() (*bool, bool) {
+	if o == nil || IsNil(o.BinCommercial) {
+		return nil, false
+	}
+	return o.BinCommercial, true
+}
+
+// HasBinCommercial returns a boolean if a field has been set.
+func (o *AuthReference) HasBinCommercial() bool {
+	if o != nil && !IsNil(o.BinCommercial) {
+		return true
+	}
+
+	return false
+}
+
+// SetBinCommercial gets a reference to the given bool and assigns it to the BinCommercial field.
+func (o *AuthReference) SetBinCommercial(v bool) {
+	o.BinCommercial = &v
+}
+
+// GetBinConsumer returns the BinConsumer field value if set, zero value otherwise.
+func (o *AuthReference) GetBinConsumer() bool {
+	if o == nil || IsNil(o.BinConsumer) {
+		var ret bool
+		return ret
+	}
+	return *o.BinConsumer
+}
+
+// GetBinConsumerOk returns a tuple with the BinConsumer field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *AuthReference) GetBinConsumerOk() (*bool, bool) {
+	if o == nil || IsNil(o.BinConsumer) {
+		return nil, false
+	}
+	return o.BinConsumer, true
+}
+
+// HasBinConsumer returns a boolean if a field has been set.
+func (o *AuthReference) HasBinConsumer() bool {
+	if o != nil && !IsNil(o.BinConsumer) {
+		return true
+	}
+
+	return false
+}
+
+// SetBinConsumer gets a reference to the given bool and assigns it to the BinConsumer field.
+func (o *AuthReference) SetBinConsumer(v bool) {
+	o.BinConsumer = &v
+}
+
+// GetBinCorporate returns the BinCorporate field value if set, zero value otherwise.
+func (o *AuthReference) GetBinCorporate() bool {
+	if o == nil || IsNil(o.BinCorporate) {
+		var ret bool
+		return ret
+	}
+	return *o.BinCorporate
+}
+
+// GetBinCorporateOk returns a tuple with the BinCorporate field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *AuthReference) GetBinCorporateOk() (*bool, bool) {
+	if o == nil || IsNil(o.BinCorporate) {
+		return nil, false
+	}
+	return o.BinCorporate, true
+}
+
+// HasBinCorporate returns a boolean if a field has been set.
+func (o *AuthReference) HasBinCorporate() bool {
+	if o != nil && !IsNil(o.BinCorporate) {
+		return true
+	}
+
+	return false
+}
+
+// SetBinCorporate gets a reference to the given bool and assigns it to the BinCorporate field.
+func (o *AuthReference) SetBinCorporate(v bool) {
+	o.BinCorporate = &v
+}
+
+// GetBinCredit returns the BinCredit field value if set, zero value otherwise.
+func (o *AuthReference) GetBinCredit() bool {
+	if o == nil || IsNil(o.BinCredit) {
+		var ret bool
+		return ret
+	}
+	return *o.BinCredit
+}
+
+// GetBinCreditOk returns a tuple with the BinCredit field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *AuthReference) GetBinCreditOk() (*bool, bool) {
+	if o == nil || IsNil(o.BinCredit) {
+		return nil, false
+	}
+	return o.BinCredit, true
+}
+
+// HasBinCredit returns a boolean if a field has been set.
+func (o *AuthReference) HasBinCredit() bool {
+	if o != nil && !IsNil(o.BinCredit) {
+		return true
+	}
+
+	return false
+}
+
+// SetBinCredit gets a reference to the given bool and assigns it to the BinCredit field.
+func (o *AuthReference) SetBinCredit(v bool) {
+	o.BinCredit = &v
+}
+
+// GetBinDebit returns the BinDebit field value if set, zero value otherwise.
+func (o *AuthReference) GetBinDebit() bool {
+	if o == nil || IsNil(o.BinDebit) {
+		var ret bool
+		return ret
+	}
+	return *o.BinDebit
+}
+
+// GetBinDebitOk returns a tuple with the BinDebit field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *AuthReference) GetBinDebitOk() (*bool, bool) {
+	if o == nil || IsNil(o.BinDebit) {
+		return nil, false
+	}
+	return o.BinDebit, true
+}
+
+// HasBinDebit returns a boolean if a field has been set.
+func (o *AuthReference) HasBinDebit() bool {
+	if o != nil && !IsNil(o.BinDebit) {
+		return true
+	}
+
+	return false
+}
+
+// SetBinDebit gets a reference to the given bool and assigns it to the BinDebit field.
+func (o *AuthReference) SetBinDebit(v bool) {
+	o.BinDebit = &v
+}
+
+// GetCardholderAgreement returns the CardholderAgreement field value if set, zero value otherwise.
+func (o *AuthReference) GetCardholderAgreement() string {
+	if o == nil || IsNil(o.CardholderAgreement) {
+		var ret string
+		return ret
+	}
+	return *o.CardholderAgreement
+}
+
+// GetCardholderAgreementOk returns a tuple with the CardholderAgreement field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *AuthReference) GetCardholderAgreementOk() (*string, bool) {
+	if o == nil || IsNil(o.CardholderAgreement) {
+		return nil, false
+	}
+	return o.CardholderAgreement, true
+}
+
+// HasCardholderAgreement returns a boolean if a field has been set.
+func (o *AuthReference) HasCardholderAgreement() bool {
+	if o != nil && !IsNil(o.CardholderAgreement) {
+		return true
+	}
+
+	return false
+}
+
+// SetCardholderAgreement gets a reference to the given string and assigns it to the CardholderAgreement field.
+func (o *AuthReference) SetCardholderAgreement(v string) {
+	o.CardholderAgreement = &v
 }
 
 // GetCurrency returns the Currency field value if set, zero value otherwise.
@@ -292,6 +589,102 @@ func (o *AuthReference) SetDatetime(v time.Time) {
 	o.Datetime = &v
 }
 
+// GetEci returns the Eci field value if set, zero value otherwise.
+func (o *AuthReference) GetEci() string {
+	if o == nil || IsNil(o.Eci) {
+		var ret string
+		return ret
+	}
+	return *o.Eci
+}
+
+// GetEciOk returns a tuple with the Eci field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *AuthReference) GetEciOk() (*string, bool) {
+	if o == nil || IsNil(o.Eci) {
+		return nil, false
+	}
+	return o.Eci, true
+}
+
+// HasEci returns a boolean if a field has been set.
+func (o *AuthReference) HasEci() bool {
+	if o != nil && !IsNil(o.Eci) {
+		return true
+	}
+
+	return false
+}
+
+// SetEci gets a reference to the given string and assigns it to the Eci field.
+func (o *AuthReference) SetEci(v string) {
+	o.Eci = &v
+}
+
+// GetEmail returns the Email field value if set, zero value otherwise.
+func (o *AuthReference) GetEmail() string {
+	if o == nil || IsNil(o.Email) {
+		var ret string
+		return ret
+	}
+	return *o.Email
+}
+
+// GetEmailOk returns a tuple with the Email field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *AuthReference) GetEmailOk() (*string, bool) {
+	if o == nil || IsNil(o.Email) {
+		return nil, false
+	}
+	return o.Email, true
+}
+
+// HasEmail returns a boolean if a field has been set.
+func (o *AuthReference) HasEmail() bool {
+	if o != nil && !IsNil(o.Email) {
+		return true
+	}
+
+	return false
+}
+
+// SetEmail gets a reference to the given string and assigns it to the Email field.
+func (o *AuthReference) SetEmail(v string) {
+	o.Email = &v
+}
+
+// GetEnv returns the Env field value if set, zero value otherwise.
+func (o *AuthReference) GetEnv() string {
+	if o == nil || IsNil(o.Env) {
+		var ret string
+		return ret
+	}
+	return *o.Env
+}
+
+// GetEnvOk returns a tuple with the Env field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *AuthReference) GetEnvOk() (*string, bool) {
+	if o == nil || IsNil(o.Env) {
+		return nil, false
+	}
+	return o.Env, true
+}
+
+// HasEnv returns a boolean if a field has been set.
+func (o *AuthReference) HasEnv() bool {
+	if o != nil && !IsNil(o.Env) {
+		return true
+	}
+
+	return false
+}
+
+// SetEnv gets a reference to the given string and assigns it to the Env field.
+func (o *AuthReference) SetEnv(v string) {
+	o.Env = &v
+}
+
 // GetIdentifier returns the Identifier field value if set, zero value otherwise.
 func (o *AuthReference) GetIdentifier() string {
 	if o == nil || IsNil(o.Identifier) {
@@ -322,6 +715,70 @@ func (o *AuthReference) HasIdentifier() bool {
 // SetIdentifier gets a reference to the given string and assigns it to the Identifier field.
 func (o *AuthReference) SetIdentifier(v string) {
 	o.Identifier = &v
+}
+
+// GetInitiation returns the Initiation field value if set, zero value otherwise.
+func (o *AuthReference) GetInitiation() string {
+	if o == nil || IsNil(o.Initiation) {
+		var ret string
+		return ret
+	}
+	return *o.Initiation
+}
+
+// GetInitiationOk returns a tuple with the Initiation field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *AuthReference) GetInitiationOk() (*string, bool) {
+	if o == nil || IsNil(o.Initiation) {
+		return nil, false
+	}
+	return o.Initiation, true
+}
+
+// HasInitiation returns a boolean if a field has been set.
+func (o *AuthReference) HasInitiation() bool {
+	if o != nil && !IsNil(o.Initiation) {
+		return true
+	}
+
+	return false
+}
+
+// SetInitiation gets a reference to the given string and assigns it to the Initiation field.
+func (o *AuthReference) SetInitiation(v string) {
+	o.Initiation = &v
+}
+
+// GetInstrument returns the Instrument field value if set, zero value otherwise.
+func (o *AuthReference) GetInstrument() string {
+	if o == nil || IsNil(o.Instrument) {
+		var ret string
+		return ret
+	}
+	return *o.Instrument
+}
+
+// GetInstrumentOk returns a tuple with the Instrument field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *AuthReference) GetInstrumentOk() (*string, bool) {
+	if o == nil || IsNil(o.Instrument) {
+		return nil, false
+	}
+	return o.Instrument, true
+}
+
+// HasInstrument returns a boolean if a field has been set.
+func (o *AuthReference) HasInstrument() bool {
+	if o != nil && !IsNil(o.Instrument) {
+		return true
+	}
+
+	return false
+}
+
+// SetInstrument gets a reference to the given string and assigns it to the Instrument field.
+func (o *AuthReference) SetInstrument(v string) {
+	o.Instrument = &v
 }
 
 // GetMaskedpan returns the Maskedpan field value if set, zero value otherwise.
@@ -388,6 +845,102 @@ func (o *AuthReference) SetMerchantid(v int32) {
 	o.Merchantid = &v
 }
 
+// GetMeta returns the Meta field value if set, zero value otherwise.
+func (o *AuthReference) GetMeta() map[string]string {
+	if o == nil || IsNil(o.Meta) {
+		var ret map[string]string
+		return ret
+	}
+	return *o.Meta
+}
+
+// GetMetaOk returns a tuple with the Meta field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *AuthReference) GetMetaOk() (*map[string]string, bool) {
+	if o == nil || IsNil(o.Meta) {
+		return nil, false
+	}
+	return o.Meta, true
+}
+
+// HasMeta returns a boolean if a field has been set.
+func (o *AuthReference) HasMeta() bool {
+	if o != nil && !IsNil(o.Meta) {
+		return true
+	}
+
+	return false
+}
+
+// SetMeta gets a reference to the given map[string]string and assigns it to the Meta field.
+func (o *AuthReference) SetMeta(v map[string]string) {
+	o.Meta = &v
+}
+
+// GetNameOnCard returns the NameOnCard field value if set, zero value otherwise.
+func (o *AuthReference) GetNameOnCard() string {
+	if o == nil || IsNil(o.NameOnCard) {
+		var ret string
+		return ret
+	}
+	return *o.NameOnCard
+}
+
+// GetNameOnCardOk returns a tuple with the NameOnCard field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *AuthReference) GetNameOnCardOk() (*string, bool) {
+	if o == nil || IsNil(o.NameOnCard) {
+		return nil, false
+	}
+	return o.NameOnCard, true
+}
+
+// HasNameOnCard returns a boolean if a field has been set.
+func (o *AuthReference) HasNameOnCard() bool {
+	if o != nil && !IsNil(o.NameOnCard) {
+		return true
+	}
+
+	return false
+}
+
+// SetNameOnCard gets a reference to the given string and assigns it to the NameOnCard field.
+func (o *AuthReference) SetNameOnCard(v string) {
+	o.NameOnCard = &v
+}
+
+// GetPostcode returns the Postcode field value if set, zero value otherwise.
+func (o *AuthReference) GetPostcode() string {
+	if o == nil || IsNil(o.Postcode) {
+		var ret string
+		return ret
+	}
+	return *o.Postcode
+}
+
+// GetPostcodeOk returns a tuple with the Postcode field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *AuthReference) GetPostcodeOk() (*string, bool) {
+	if o == nil || IsNil(o.Postcode) {
+		return nil, false
+	}
+	return o.Postcode, true
+}
+
+// HasPostcode returns a boolean if a field has been set.
+func (o *AuthReference) HasPostcode() bool {
+	if o != nil && !IsNil(o.Postcode) {
+		return true
+	}
+
+	return false
+}
+
+// SetPostcode gets a reference to the given string and assigns it to the Postcode field.
+func (o *AuthReference) SetPostcode(v string) {
+	o.Postcode = &v
+}
+
 // GetResult returns the Result field value if set, zero value otherwise.
 func (o *AuthReference) GetResult() string {
 	if o == nil || IsNil(o.Result) {
@@ -418,6 +971,102 @@ func (o *AuthReference) HasResult() bool {
 // SetResult gets a reference to the given string and assigns it to the Result field.
 func (o *AuthReference) SetResult(v string) {
 	o.Result = &v
+}
+
+// GetResultId returns the ResultId field value if set, zero value otherwise.
+func (o *AuthReference) GetResultId() string {
+	if o == nil || IsNil(o.ResultId) {
+		var ret string
+		return ret
+	}
+	return *o.ResultId
+}
+
+// GetResultIdOk returns a tuple with the ResultId field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *AuthReference) GetResultIdOk() (*string, bool) {
+	if o == nil || IsNil(o.ResultId) {
+		return nil, false
+	}
+	return o.ResultId, true
+}
+
+// HasResultId returns a boolean if a field has been set.
+func (o *AuthReference) HasResultId() bool {
+	if o != nil && !IsNil(o.ResultId) {
+		return true
+	}
+
+	return false
+}
+
+// SetResultId gets a reference to the given string and assigns it to the ResultId field.
+func (o *AuthReference) SetResultId(v string) {
+	o.ResultId = &v
+}
+
+// GetScheme returns the Scheme field value if set, zero value otherwise.
+func (o *AuthReference) GetScheme() string {
+	if o == nil || IsNil(o.Scheme) {
+		var ret string
+		return ret
+	}
+	return *o.Scheme
+}
+
+// GetSchemeOk returns a tuple with the Scheme field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *AuthReference) GetSchemeOk() (*string, bool) {
+	if o == nil || IsNil(o.Scheme) {
+		return nil, false
+	}
+	return o.Scheme, true
+}
+
+// HasScheme returns a boolean if a field has been set.
+func (o *AuthReference) HasScheme() bool {
+	if o != nil && !IsNil(o.Scheme) {
+		return true
+	}
+
+	return false
+}
+
+// SetScheme gets a reference to the given string and assigns it to the Scheme field.
+func (o *AuthReference) SetScheme(v string) {
+	o.Scheme = &v
+}
+
+// GetSchemeLogo returns the SchemeLogo field value if set, zero value otherwise.
+func (o *AuthReference) GetSchemeLogo() string {
+	if o == nil || IsNil(o.SchemeLogo) {
+		var ret string
+		return ret
+	}
+	return *o.SchemeLogo
+}
+
+// GetSchemeLogoOk returns a tuple with the SchemeLogo field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *AuthReference) GetSchemeLogoOk() (*string, bool) {
+	if o == nil || IsNil(o.SchemeLogo) {
+		return nil, false
+	}
+	return o.SchemeLogo, true
+}
+
+// HasSchemeLogo returns a boolean if a field has been set.
+func (o *AuthReference) HasSchemeLogo() bool {
+	if o != nil && !IsNil(o.SchemeLogo) {
+		return true
+	}
+
+	return false
+}
+
+// SetSchemeLogo gets a reference to the given string and assigns it to the SchemeLogo field.
+func (o *AuthReference) SetSchemeLogo(v string) {
+	o.SchemeLogo = &v
 }
 
 // GetTransStatus returns the TransStatus field value if set, zero value otherwise.
@@ -516,6 +1165,70 @@ func (o *AuthReference) SetTransno(v int32) {
 	o.Transno = &v
 }
 
+// GetType returns the Type field value if set, zero value otherwise.
+func (o *AuthReference) GetType() string {
+	if o == nil || IsNil(o.Type) {
+		var ret string
+		return ret
+	}
+	return *o.Type
+}
+
+// GetTypeOk returns a tuple with the Type field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *AuthReference) GetTypeOk() (*string, bool) {
+	if o == nil || IsNil(o.Type) {
+		return nil, false
+	}
+	return o.Type, true
+}
+
+// HasType returns a boolean if a field has been set.
+func (o *AuthReference) HasType() bool {
+	if o != nil && !IsNil(o.Type) {
+		return true
+	}
+
+	return false
+}
+
+// SetType gets a reference to the given string and assigns it to the Type field.
+func (o *AuthReference) SetType(v string) {
+	o.Type = &v
+}
+
+// GetUtc returns the Utc field value if set, zero value otherwise.
+func (o *AuthReference) GetUtc() int64 {
+	if o == nil || IsNil(o.Utc) {
+		var ret int64
+		return ret
+	}
+	return *o.Utc
+}
+
+// GetUtcOk returns a tuple with the Utc field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *AuthReference) GetUtcOk() (*int64, bool) {
+	if o == nil || IsNil(o.Utc) {
+		return nil, false
+	}
+	return o.Utc, true
+}
+
+// HasUtc returns a boolean if a field has been set.
+func (o *AuthReference) HasUtc() bool {
+	if o != nil && !IsNil(o.Utc) {
+		return true
+	}
+
+	return false
+}
+
+// SetUtc gets a reference to the given int64 and assigns it to the Utc field.
+func (o *AuthReference) SetUtc(v int64) {
+	o.Utc = &v
+}
+
 func (o AuthReference) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -526,6 +1239,9 @@ func (o AuthReference) MarshalJSON() ([]byte, error) {
 
 func (o AuthReference) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
+	if !IsNil(o.Address) {
+		toSerialize["address"] = o.Address
+	}
 	if !IsNil(o.Amount) {
 		toSerialize["amount"] = o.Amount
 	}
@@ -538,8 +1254,29 @@ func (o AuthReference) ToMap() (map[string]interface{}, error) {
 	if !IsNil(o.Authcode) {
 		toSerialize["authcode"] = o.Authcode
 	}
+	if !IsNil(o.AuthenResult) {
+		toSerialize["authen_result"] = o.AuthenResult
+	}
 	if !IsNil(o.Batchno) {
 		toSerialize["batchno"] = o.Batchno
+	}
+	if !IsNil(o.BinCommercial) {
+		toSerialize["bin_commercial"] = o.BinCommercial
+	}
+	if !IsNil(o.BinConsumer) {
+		toSerialize["bin_consumer"] = o.BinConsumer
+	}
+	if !IsNil(o.BinCorporate) {
+		toSerialize["bin_corporate"] = o.BinCorporate
+	}
+	if !IsNil(o.BinCredit) {
+		toSerialize["bin_credit"] = o.BinCredit
+	}
+	if !IsNil(o.BinDebit) {
+		toSerialize["bin_debit"] = o.BinDebit
+	}
+	if !IsNil(o.CardholderAgreement) {
+		toSerialize["cardholder_agreement"] = o.CardholderAgreement
 	}
 	if !IsNil(o.Currency) {
 		toSerialize["currency"] = o.Currency
@@ -547,8 +1284,23 @@ func (o AuthReference) ToMap() (map[string]interface{}, error) {
 	if !IsNil(o.Datetime) {
 		toSerialize["datetime"] = o.Datetime
 	}
+	if !IsNil(o.Eci) {
+		toSerialize["eci"] = o.Eci
+	}
+	if !IsNil(o.Email) {
+		toSerialize["email"] = o.Email
+	}
+	if !IsNil(o.Env) {
+		toSerialize["env"] = o.Env
+	}
 	if !IsNil(o.Identifier) {
 		toSerialize["identifier"] = o.Identifier
+	}
+	if !IsNil(o.Initiation) {
+		toSerialize["initiation"] = o.Initiation
+	}
+	if !IsNil(o.Instrument) {
+		toSerialize["instrument"] = o.Instrument
 	}
 	if !IsNil(o.Maskedpan) {
 		toSerialize["maskedpan"] = o.Maskedpan
@@ -556,8 +1308,26 @@ func (o AuthReference) ToMap() (map[string]interface{}, error) {
 	if !IsNil(o.Merchantid) {
 		toSerialize["merchantid"] = o.Merchantid
 	}
+	if !IsNil(o.Meta) {
+		toSerialize["meta"] = o.Meta
+	}
+	if !IsNil(o.NameOnCard) {
+		toSerialize["name_on_card"] = o.NameOnCard
+	}
+	if !IsNil(o.Postcode) {
+		toSerialize["postcode"] = o.Postcode
+	}
 	if !IsNil(o.Result) {
 		toSerialize["result"] = o.Result
+	}
+	if !IsNil(o.ResultId) {
+		toSerialize["result_id"] = o.ResultId
+	}
+	if !IsNil(o.Scheme) {
+		toSerialize["scheme"] = o.Scheme
+	}
+	if !IsNil(o.SchemeLogo) {
+		toSerialize["scheme_logo"] = o.SchemeLogo
 	}
 	if !IsNil(o.TransStatus) {
 		toSerialize["trans_status"] = o.TransStatus
@@ -567,6 +1337,12 @@ func (o AuthReference) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.Transno) {
 		toSerialize["transno"] = o.Transno
+	}
+	if !IsNil(o.Type) {
+		toSerialize["type"] = o.Type
+	}
+	if !IsNil(o.Utc) {
+		toSerialize["utc"] = o.Utc
 	}
 	return toSerialize, nil
 }
