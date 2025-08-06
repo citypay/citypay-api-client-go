@@ -11,7 +11,7 @@ package citypay
 
 import (
 	"context"
-	openapiclient "github.com/citypay/citypay-api-client-go"
+	openapiclient "github.com/citypay/citypay-api-client-go/citypay"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"os"

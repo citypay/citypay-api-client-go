@@ -11,7 +11,7 @@ package citypay
 
 import (
 	"context"
-	openapiclient "github.com/citypay/citypay-api-client-go"
+	openapiclient "github.com/citypay/citypay-api-client-go/citypay"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"os"
@@ -130,7 +130,8 @@ func Test_citypay_PaylinkApiService(t *testing.T) {
 		configModel := openapiclient.NewPaylinkConfig()
 		configModel.SetFieldGuard([]openapiclient.PaylinkFieldGuardModel{*fieldGuardModel})
 
-		attachmentModel := openapiclient.NewPaylinkAttachmentRequest("filename", "application/pdf")
+		attachmentModel := openapiclient.NewPaylinkAttachmentRequest("filename", "application/json")
+		attachmentModel.SetData("{\"key\":\"value\"}")
 
 		tokenModel := openapiclient.NewPaylinkTokenRequestModel(1, generateRandomId(), cpMerchantId)
 		tokenModel.SetConfig(*configModel)

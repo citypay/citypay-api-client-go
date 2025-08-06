@@ -11,7 +11,7 @@ package citypay
 
 import (
 	"context"
-	openapiclient "github.com/citypay/citypay-api-client-go"
+	openapiclient "github.com/citypay/citypay-api-client-go/citypay"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"os"
@@ -36,8 +36,8 @@ func Test_citypay_AuthorisationAndPaymentApiService(t *testing.T) {
 
 	cpClientId := os.Getenv("CP_CLIENT_ID")
 	cpLicenceKey := os.Getenv("CP_LICENCE_KEY")
-	//cpMerchantId64, _ := strconv.Atoi(os.Getenv("CP_MERCHANT_ID"))
-	//cpMerchantId := int32(cpMerchantId64)
+	cpMerchantId64, _ := strconv.Atoi(os.Getenv("CP_MERCHANT_ID"))
+	cpMerchantId := int32(cpMerchantId64)
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
@@ -53,14 +53,16 @@ func Test_citypay_AuthorisationAndPaymentApiService(t *testing.T) {
 
 	t.Run("Test AuthorisationAndPaymentApiService AuthorisationRequest", func(t *testing.T) {
 
-		//resp, httpRes, err := apiClient.AuthorisationAndPaymentApi.AuthorisationRequest(
-		//	sandboxContext).
-		//	AuthRequest(*openapiclient.NewAuthRequest(1, getValidCardNumber(), 12, 2028, generateRandomId(), cpMerchantId)).
-		//	Execute()
-		//
-		//require.Nil(t, err)
-		//require.NotNil(t, resp)
-		//assert.Equal(t, 200, httpRes.StatusCode)
+		t.Skip("Not updated for latest changes")
+
+		resp, httpRes, err := apiClient.AuthorisationAndPaymentApi.AuthorisationRequest(
+			sandboxContext).
+			AuthRequest(*openapiclient.NewAuthRequest(1, getValidCardNumber(), 12, 2028, generateRandomId(), cpMerchantId)).
+			Execute()
+
+		require.Nil(t, err)
+		require.NotNil(t, resp)
+		assert.Equal(t, 200, httpRes.StatusCode)
 
 	})
 
@@ -78,106 +80,120 @@ func Test_citypay_AuthorisationAndPaymentApiService(t *testing.T) {
 
 	t.Run("Test AuthorisationAndPaymentApiService CResRequest", func(t *testing.T) {
 
-		//auth, _, _ := apiClient.AuthorisationAndPaymentApi.AuthorisationRequest(
-		//	sandboxContext).
-		//	AuthRequest(*openapiclient.NewAuthRequest(1, getValidCardNumber(), 12, 2028, generateRandomId(), cpMerchantId)).
-		//	Execute()
-		//
-		//auth.GetAuthResponseOk()
-		//model := openapiclient.NewCResAuthRequest()
-		//model.SetCres("x90+vZ/7Ll05Vid/jPfQn8adw+4D/vRDUGT19kndW97Hfirbv66ycfSp8jNlvy7PkHbx44NEt3vo...")
-		//
-		//resp, httpRes, err := apiClient.AuthorisationAndPaymentApi.
-		//	CResRequest(sandboxContext).
-		//	CResAuthRequest(*model).
-		//	Execute()
-		//
-		//require.Nil(t, err)
-		//require.NotNil(t, resp)
-		//assert.Equal(t, 200, httpRes.StatusCode)
+		t.Skip("Not updated for latest changes")
+
+		auth, _, _ := apiClient.AuthorisationAndPaymentApi.AuthorisationRequest(
+			sandboxContext).
+			AuthRequest(*openapiclient.NewAuthRequest(1, getValidCardNumber(), 12, 2028, generateRandomId(), cpMerchantId)).
+			Execute()
+
+		auth.GetAuthResponseOk()
+		model := openapiclient.NewCResAuthRequest()
+		model.SetCres("x90+vZ/7Ll05Vid/jPfQn8adw+4D/vRDUGT19kndW97Hfirbv66ycfSp8jNlvy7PkHbx44NEt3vo...")
+
+		resp, httpRes, err := apiClient.AuthorisationAndPaymentApi.
+			CResRequest(sandboxContext).
+			CResAuthRequest(*model).
+			Execute()
+
+		require.Nil(t, err)
+		require.NotNil(t, resp)
+		assert.Equal(t, 200, httpRes.StatusCode)
 
 	})
 
 	t.Run("Test AuthorisationAndPaymentApiService CaptureRequest", func(t *testing.T) {
 
-		//transaction := generateTransaction(apiClient, sandboxContext)
-		//
-		//model := openapiclient.NewCaptureRequest(cpMerchantId)
-		//model.SetTransno(transaction.GetTransno())
-		//
-		//resp, httpRes, err := apiClient.AuthorisationAndPaymentApi.
-		//	CaptureRequest(sandboxContext).
-		//	CaptureRequest(*model).
-		//	Execute()
-		//
-		//require.Nil(t, err)
-		//require.NotNil(t, resp)
-		//assert.Equal(t, 200, httpRes.StatusCode)
+		t.Skip("Not updated for latest changes")
+
+		transaction := generateTransaction(apiClient, sandboxContext)
+
+		model := openapiclient.NewCaptureRequest(cpMerchantId)
+		model.SetTransno(transaction.GetTransno())
+
+		resp, httpRes, err := apiClient.AuthorisationAndPaymentApi.
+			CaptureRequest(sandboxContext).
+			CaptureRequest(*model).
+			Execute()
+
+		require.Nil(t, err)
+		require.NotNil(t, resp)
+		assert.Equal(t, 200, httpRes.StatusCode)
 
 	})
 
 	t.Run("Test AuthorisationAndPaymentApiService CreatePaymentIntent", func(t *testing.T) {
 
-		//resp, httpRes, err := apiClient.AuthorisationAndPaymentApi.CreatePaymentIntent(sandboxContext).PaymentIntent(*openapiclient.NewPaymentIntent(1, generateRandomId())).Execute()
-		//
-		//require.Nil(t, err)
-		//require.NotNil(t, resp)
-		//assert.Equal(t, 200, httpRes.StatusCode)
+		t.Skip("Not updated for latest changes")
+
+		resp, httpRes, err := apiClient.AuthorisationAndPaymentApi.CreatePaymentIntent(sandboxContext).PaymentIntent(*openapiclient.NewPaymentIntent(1, generateRandomId())).Execute()
+
+		require.Nil(t, err)
+		require.NotNil(t, resp)
+		assert.Equal(t, 200, httpRes.StatusCode)
 
 	})
 
 	t.Run("Test AuthorisationAndPaymentApiService PaResRequest", func(t *testing.T) {
 
-		//resp, httpRes, err := apiClient.AuthorisationAndPaymentApi.PaResRequest(sandboxContext).Execute()
-		//
-		//require.Nil(t, err)
-		//require.NotNil(t, resp)
-		//assert.Equal(t, 200, httpRes.StatusCode)
+		t.Skip("Not updated for latest changes")
+
+		resp, httpRes, err := apiClient.AuthorisationAndPaymentApi.PaResRequest(sandboxContext).Execute()
+
+		require.Nil(t, err)
+		require.NotNil(t, resp)
+		assert.Equal(t, 200, httpRes.StatusCode)
 
 	})
 
 	t.Run("Test AuthorisationAndPaymentApiService RefundRequest", func(t *testing.T) {
 
-		//model := openapiclient.NewRefundRequest(1, generateRandomId(), cpMerchantId, 1)
-		//
-		//resp, httpRes, err := apiClient.AuthorisationAndPaymentApi.RefundRequest(sandboxContext).RefundRequest(*model).Execute()
-		//
-		//require.Nil(t, err)
-		//require.NotNil(t, resp)
-		//assert.Equal(t, 200, httpRes.StatusCode)
+		t.Skip("Not updated for latest changes")
+
+		model := openapiclient.NewRefundRequest(1, generateRandomId(), cpMerchantId, 1)
+
+		resp, httpRes, err := apiClient.AuthorisationAndPaymentApi.RefundRequest(sandboxContext).RefundRequest(*model).Execute()
+
+		require.Nil(t, err)
+		require.NotNil(t, resp)
+		assert.Equal(t, 200, httpRes.StatusCode)
 
 	})
 
 	t.Run("Test AuthorisationAndPaymentApiService RetrievalRequest", func(t *testing.T) {
 
-		//transaction := generateTransaction(apiClient, sandboxContext)
-		//
-		//model := openapiclient.NewRetrieveRequest(cpMerchantId)
-		//model.SetTransno(*transaction.Transno)
-		//
-		//resp, httpRes, err := apiClient.AuthorisationAndPaymentApi.RetrievalRequest(sandboxContext).RetrieveRequest(*model).Execute()
-		//
-		//require.Nil(t, err)
-		//require.NotNil(t, resp)
-		//assert.Equal(t, 200, httpRes.StatusCode)
+		t.Skip("Not updated for latest changes")
+
+		transaction := generateTransaction(apiClient, sandboxContext)
+
+		model := openapiclient.NewRetrieveRequest(cpMerchantId)
+		model.SetTransno(*transaction.Transno)
+
+		resp, httpRes, err := apiClient.AuthorisationAndPaymentApi.RetrievalRequest(sandboxContext).RetrieveRequest(*model).Execute()
+
+		require.Nil(t, err)
+		require.NotNil(t, resp)
+		assert.Equal(t, 200, httpRes.StatusCode)
 
 	})
 
 	t.Run("Test AuthorisationAndPaymentApiService VoidRequest", func(t *testing.T) {
 
-		//transaction := generateTransaction(apiClient, sandboxContext)
-		//
-		//model := openapiclient.NewVoidRequest(cpMerchantId)
-		//model.SetTransno(*transaction.Transno)
-		//
-		//resp, httpRes, err := apiClient.AuthorisationAndPaymentApi.
-		//	VoidRequest(sandboxContext).
-		//	VoidRequest(*model).
-		//	Execute()
-		//
-		//require.Nil(t, err)
-		//require.NotNil(t, resp)
-		//assert.Equal(t, 200, httpRes.StatusCode)
+		t.Skip("Not updated for latest changes")
+
+		transaction := generateTransaction(apiClient, sandboxContext)
+
+		model := openapiclient.NewVoidRequest(cpMerchantId)
+		model.SetTransno(*transaction.Transno)
+
+		resp, httpRes, err := apiClient.AuthorisationAndPaymentApi.
+			VoidRequest(sandboxContext).
+			VoidRequest(*model).
+			Execute()
+
+		require.Nil(t, err)
+		require.NotNil(t, resp)
+		assert.Equal(t, 200, httpRes.StatusCode)
 
 	})
 

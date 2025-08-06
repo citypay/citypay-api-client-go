@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	openapiclient "github.com/citypay/citypay-api-client-go"
+	openapiclient "github.com/citypay/citypay-api-client-go/citypay"
 )
 
 func Test_citypay_ApiKey(t *testing.T) {
