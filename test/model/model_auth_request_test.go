@@ -51,7 +51,7 @@ func buildAuthThreeDSecure() openapiclient.ThreeDSecure {
 }
 
 func buildExampleAuthRequest() *openapiclient.AuthRequest {
-	r := openapiclient.NewAuthRequest(exampleReqAmount, exampleReqCard, exampleReqExpMonth, exampleReqExpYear, exampleReqIdentifier, exampleReqMerchantID)
+	r := openapiclient.NewAuthRequest(exampleReqAmount, exampleReqIdentifier, exampleReqMerchantID)
 	r.SetAirlineData(*buildExampleAdvice())
 	r.SetAvsPostcodePolicy(exampleReqAvsPostcodePolicy)
 	r.SetBillTo(buildExampleContact())
@@ -73,10 +73,9 @@ func buildExampleAuthRequest() *openapiclient.AuthRequest {
 }
 
 func TestNewAuthRequest(t *testing.T) {
-	model := openapiclient.NewAuthRequest(exampleReqAmount, exampleReqCard, exampleReqExpMonth, exampleReqExpYear, exampleReqIdentifier, exampleReqMerchantID)
+	model := openapiclient.NewAuthRequest(exampleReqAmount, exampleReqIdentifier, exampleReqMerchantID)
 	require.NotNil(t, model)
 	assert.Equal(t, exampleReqAmount, model.GetAmount())
-	assert.Equal(t, exampleReqCard, model.GetCardnumber())
 	assert.False(t, model.HasAirlineData())
 	assert.False(t, model.HasAvsPostcodePolicy())
 	assert.False(t, model.HasBillTo())
@@ -92,7 +91,7 @@ func TestNewAuthRequestWithDefaults(t *testing.T) {
 }
 
 func TestAuthRequestSetGetCycle(t *testing.T) {
-	model := openapiclient.NewAuthRequest(exampleReqAmount, exampleReqCard, exampleReqExpMonth, exampleReqExpYear, exampleReqIdentifier, exampleReqMerchantID)
+	model := openapiclient.NewAuthRequest(exampleReqAmount, exampleReqIdentifier, exampleReqMerchantID)
 	model.SetAirlineData(*buildExampleAdvice())
 	assert.True(t, model.HasAirlineData())
 

@@ -2,10 +2,11 @@ package citypay
 
 import (
 	"encoding/json"
+	"testing"
+
 	openapiclient "github.com/citypay/citypay-api-client-go/citypay"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 var exampleDPAmount int32 = 9999
@@ -42,7 +43,7 @@ func buildExampleThreeDS() openapiclient.ThreeDSecure {
 }
 
 func buildExampleDirectPostRequest() *openapiclient.DirectPostRequest {
-	d := openapiclient.NewDirectPostRequest(exampleDPAmount, exampleDPCard, exampleDPExpMonth, exampleDPExpYear, exampleDPIdentifier, exampleDPMac)
+	d := openapiclient.NewDirectPostRequest(exampleDPAmount, exampleDPIdentifier, exampleDPMac)
 	d.SetAvsPostcodePolicy(exampleDPAvsPolicy)
 	d.SetBillTo(buildDirectPostContact())
 	d.SetCsc(exampleDPCsc)
@@ -63,10 +64,9 @@ func buildExampleDirectPostRequest() *openapiclient.DirectPostRequest {
 }
 
 func TestNewDirectPostRequest(t *testing.T) {
-	model := openapiclient.NewDirectPostRequest(exampleDPAmount, exampleDPCard, exampleDPExpMonth, exampleDPExpYear, exampleDPIdentifier, exampleDPMac)
+	model := openapiclient.NewDirectPostRequest(exampleDPAmount, exampleDPIdentifier, exampleDPMac)
 	require.NotNil(t, model)
 	assert.Equal(t, exampleDPAmount, model.GetAmount())
-	assert.Equal(t, exampleDPCard, model.GetCardnumber())
 	assert.False(t, model.HasCsc())
 }
 
@@ -78,7 +78,7 @@ func TestNewDirectPostRequestWithDefaults(t *testing.T) {
 }
 
 func TestDirectPostRequestSetGetCycle(t *testing.T) {
-	model := openapiclient.NewDirectPostRequest(exampleDPAmount, exampleDPCard, exampleDPExpMonth, exampleDPExpYear, exampleDPIdentifier, exampleDPMac)
+	model := openapiclient.NewDirectPostRequest(exampleDPAmount, exampleDPIdentifier, exampleDPMac)
 	model.SetAvsPostcodePolicy(exampleDPAvsPolicy)
 	assert.True(t, model.HasAvsPostcodePolicy())
 	assert.Equal(t, exampleDPAvsPolicy, model.GetAvsPostcodePolicy())

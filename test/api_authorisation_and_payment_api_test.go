@@ -11,12 +11,13 @@ package citypay
 
 import (
 	"context"
-	openapiclient "github.com/citypay/citypay-api-client-go/citypay"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"os"
 	"strconv"
 	"testing"
+
+	openapiclient "github.com/citypay/citypay-api-client-go/citypay"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func generateTransaction(client *openapiclient.APIClient, sandboxContext context.Context) openapiclient.AuthResponse {
@@ -26,7 +27,7 @@ func generateTransaction(client *openapiclient.APIClient, sandboxContext context
 
 	resp, _, _ := client.AuthorisationAndPaymentApi.AuthorisationRequest(
 		sandboxContext).
-		AuthRequest(*openapiclient.NewAuthRequest(1, getValidCardNumber(), 12, 2028, generateRandomId(), cpMerchantId)).
+		AuthRequest(*openapiclient.NewAuthRequest(1, getValidCardNumber(), cpMerchantId)).
 		Execute()
 
 	return resp.GetAuthResponse()
@@ -57,7 +58,7 @@ func Test_citypay_AuthorisationAndPaymentApiService(t *testing.T) {
 
 		resp, httpRes, err := apiClient.AuthorisationAndPaymentApi.AuthorisationRequest(
 			sandboxContext).
-			AuthRequest(*openapiclient.NewAuthRequest(1, getValidCardNumber(), 12, 2028, generateRandomId(), cpMerchantId)).
+			AuthRequest(*openapiclient.NewAuthRequest(1, getValidCardNumber(), cpMerchantId)).
 			Execute()
 
 		require.Nil(t, err)
@@ -84,7 +85,7 @@ func Test_citypay_AuthorisationAndPaymentApiService(t *testing.T) {
 
 		auth, _, _ := apiClient.AuthorisationAndPaymentApi.AuthorisationRequest(
 			sandboxContext).
-			AuthRequest(*openapiclient.NewAuthRequest(1, getValidCardNumber(), 12, 2028, generateRandomId(), cpMerchantId)).
+			AuthRequest(*openapiclient.NewAuthRequest(1, getValidCardNumber(), cpMerchantId)).
 			Execute()
 
 		auth.GetAuthResponseOk()
@@ -115,30 +116,6 @@ func Test_citypay_AuthorisationAndPaymentApiService(t *testing.T) {
 			CaptureRequest(sandboxContext).
 			CaptureRequest(*model).
 			Execute()
-
-		require.Nil(t, err)
-		require.NotNil(t, resp)
-		assert.Equal(t, 200, httpRes.StatusCode)
-
-	})
-
-	t.Run("Test AuthorisationAndPaymentApiService CreatePaymentIntent", func(t *testing.T) {
-
-		t.Skip("Not updated for latest changes")
-
-		resp, httpRes, err := apiClient.AuthorisationAndPaymentApi.CreatePaymentIntent(sandboxContext).PaymentIntent(*openapiclient.NewPaymentIntent(1, generateRandomId())).Execute()
-
-		require.Nil(t, err)
-		require.NotNil(t, resp)
-		assert.Equal(t, 200, httpRes.StatusCode)
-
-	})
-
-	t.Run("Test AuthorisationAndPaymentApiService PaResRequest", func(t *testing.T) {
-
-		t.Skip("Not updated for latest changes")
-
-		resp, httpRes, err := apiClient.AuthorisationAndPaymentApi.PaResRequest(sandboxContext).Execute()
 
 		require.Nil(t, err)
 		require.NotNil(t, resp)
