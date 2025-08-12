@@ -1,0 +1,795 @@
+# AuthRequest
+
+## Properties
+
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**AirlineData** | Pointer to [**AirlineAdvice**](AirlineAdvice.md) |  | [optional] 
+**Amount** | **int32** | The amount to authorise in the lowest unit of currency with a variable length to a maximum of 12 digits.  No decimal points are to be included and no divisional characters such as 1,024.  The amount should be the total amount required for the transaction.  For example with GBP £1,021.95 the amount value is 102195.  | 
+**AvsPostcodePolicy** | Pointer to **string** | A policy value which determines whether an AVS postcode policy is enforced or bypassed.  Values are:   &#x60;0&#x60; for the default policy (default value if not supplied). Your default values are determined by your account manager on setup of the account.   &#x60;1&#x60; for an enforced policy. Transactions that are enforced will be rejected if the AVS postcode numeric value does not match.   &#x60;2&#x60; to bypass. Transactions that are bypassed will be allowed through even if the postcode did not match.   &#x60;3&#x60; to ignore. Transactions that are ignored will bypass the result and not send postcode details for authorisation.  | [optional] 
+**BillTo** | Pointer to [**ContactDetails**](ContactDetails.md) |  | [optional] 
+**CardholderAgreement** | Pointer to **string** | Merchant-initiated transactions (MITs) are payments you trigger, where the cardholder has previously consented to you carrying out such payments. These may be scheduled (such as recurring payments and installments) or unscheduled (like account top-ups triggered by balance thresholds and no-show charges).  Scheduled These are regular payments using stored card details, like installments or a monthly subscription fee.  - &#x60;I&#x60; Instalment - A single purchase of goods or services billed to a cardholder in multiple transactions, over a period of time agreed by the cardholder and you.  - &#x60;R&#x60; Recurring - Transactions processed at fixed, regular intervals not to exceed one year between transactions, representing an agreement between a cardholder and you to purchase goods or services provided over a period of time.  Unscheduled These are payments using stored card details that do not occur on a regular schedule, like top-ups for a digital wallet triggered by the balance falling below a certain threshold.  - &#x60;A&#x60; Reauthorisation - a purchase made after the original purchase. A common scenario is delayed/split shipments.  - &#x60;C&#x60; Unscheduled Payment - A transaction using a stored credential for a fixed or variable amount that does not occur on a scheduled or regularly occurring transaction date. This includes account top-ups triggered by balance thresholds.  - &#x60;D&#x60; Delayed Charge - A delayed charge is typically used in hotel, cruise lines and vehicle rental environments to perform a supplemental account charge after original services are rendered.  - &#x60;L&#x60; Incremental - An incremental authorisation is typically found in hotel and car rental environments, where the cardholder has agreed to pay for any service incurred during the duration of the contract. An incremental authorisation is where you need to seek authorisation of further funds in addition to what you have originally requested. A common scenario is additional services charged to the contract, such as extending a stay in a hotel.  - &#x60;S&#x60; Resubmission - When the original purchase occurred, but you were not able to get authorisation at the time the goods or services were provided. It should be only used where the goods or services have already been provided, but the authorisation request is declined for insufficient funds.  - &#x60;X&#x60; No-show - A no-show is a transaction where you are enabled to charge for services which the cardholder entered into an agreement to purchase, but the cardholder did not meet the terms of the agreement.  - &#x60;N&#x60; Not Applicable - For all other transactions the value will be not applicable.  | [optional] 
+**Cardnumber** | Pointer to **string** | The card number (PAN) with a variable length to a maximum of 21 digits in numerical form. Any non numeric characters will be stripped out of the card number, this includes whitespace or separators internal of the provided value.  The card number must be treated as sensitive data. We only provide an obfuscated value in logging and reporting.  The plaintext value is encrypted in our database using AES 256 GMC bit encryption for settlement or refund purposes.  When providing the card number to our gateway through the authorisation API you will be handling the card data on your application. This will require further PCI controls to be in place and this value must never be stored.  | [optional] 
+**CpCardToken** | Pointer to **string** | The card token previously stored and created by the /tokenise route. | [optional] 
+**Csc** | Pointer to **string** | The Card Security Code (CSC) (also known as CV2/CVV2) is normally found on the back of the card (American Express has it on the front). The value helps to identify possession of the card as it is not available within the chip or magnetic swipe.  When forwarding the CSC, please ensure the value is a string as some values start with 0 and this will be stripped out by any integer parsing.  The CSC number aids fraud prevention in Mail Order and Internet payments.  Business rules are available on your account to identify whether to accept or decline transactions based on mismatched results of the CSC.  The Payment Card Industry (PCI) requires that at no stage of a transaction should the CSC be stored.  This applies to all entities handling card data.  It should also not be used in any hashing process.  CityPay do not store the value and have no method of retrieving the value once the transaction has been processed. For this reason, duplicate checking is unable to determine the CSC in its duplication check algorithm.  | [optional] 
+**CscPolicy** | Pointer to **string** | A policy value which determines whether a CSC policy is enforced or bypassed.  Values are:   &#x60;0&#x60; for the default policy (default value if not supplied). Your default values are determined by your account manager on setup of the account.   &#x60;1&#x60; for an enforced policy. Transactions that are enforced will be rejected if the CSC value does not match.   &#x60;2&#x60; to bypass. Transactions that are bypassed will be allowed through even if the CSC did not match.   &#x60;3&#x60; to ignore. Transactions that are ignored will bypass the result and not send the CSC details for authorisation.  | [optional] 
+**Currency** | Pointer to **string** | The processing currency for the transaction. Will default to the merchant account currency. | [optional] 
+**DuplicatePolicy** | Pointer to **string** | A policy value which determines whether a duplication policy is enforced or bypassed. A duplication check has a window of time set against your account within which it can action. If a previous transaction with matching values occurred within the window, any subsequent transaction will result in a T001 result.  Values are   &#x60;0&#x60; for the default policy (default value if not supplied). Your default values are determined by your account manager on setup of the account.   &#x60;1&#x60; for an enforced policy. Transactions that are enforced will be checked for duplication within the duplication window.   &#x60;2&#x60; to bypass. Transactions that are bypassed will not be checked for duplication within the duplication window.   &#x60;3&#x60; to ignore. Transactions that are ignored will have the same affect as bypass.  | [optional] 
+**EventManagement** | Pointer to [**EventDataModel**](EventDataModel.md) |  | [optional] 
+**Expmonth** | Pointer to **int32** | The month of expiry of the card. The month value should be a numerical value between 1 and 12.  | [optional] 
+**Expyear** | Pointer to **int32** | The year of expiry of the card.  | [optional] 
+**ExternalMpi** | Pointer to [**ExternalMPI**](ExternalMPI.md) |  | [optional] 
+**Identifier** | **string** | The identifier of the transaction to process. The value should be a valid reference and may be used to perform  post processing actions and to aid in reconciliation of transactions.  The value should be a valid printable string with ASCII character ranges from 0x32 to 0x127.  The identifier is recommended to be distinct for each transaction such as a [random unique identifier](https://en.wikipedia.org/wiki/Universally_unique_identifier) this will aid in ensuring each transaction is identifiable.  When transactions are processed they are also checked for duplicate requests. Changing the identifier on a subsequent request will ensure that a transaction is considered as different.  | 
+**Initiation** | Pointer to **string** | Transactions charged using the API are defined as:  **Cardholder Initiated**: A _cardholder initiated transaction_ (CIT) is where the cardholder selects the card for use for a purchase using previously stored details. An example would be a customer buying an item from your website after being present with their saved card details at checkout.  **Merchant Intiated**: A _merchant initiated transaction_ (MIT) is an authorisation initiated where you as the  merchant submit a cardholders previously stored details without the cardholder&#39;s participation. An example would  be a subscription to a membership scheme to debit their card monthly.  MITs have different reasons such as reauthorisation, delayed, unscheduled, incremental, recurring, instalment, no-show or resubmission.  The following values apply   - &#x60;M&#x60; - specifies that the transaction is initiated by the merchant   - &#x60;C&#x60; - specifies that the transaction is initiated by the cardholder  Where transactions are merchant initiated, a valid cardholder agreement must be defined.  | [optional] 
+**MatchAvsa** | Pointer to **string** | A policy value which determines whether an AVS address policy is enforced, bypassed or ignored.  Values are:   &#x60;0&#x60; for the default policy (default value if not supplied). Your default values are determined by your account manager on setup of the account.   &#x60;1&#x60; for an enforced policy. Transactions that are enforced will be rejected if the AVS address numeric value does not match.   &#x60;2&#x60; to bypass. Transactions that are bypassed will be allowed through even if the address did not match.   &#x60;3&#x60; to ignore. Transactions that are ignored will bypass the result and not send address numeric details for authorisation.  | [optional] 
+**Mcc6012** | Pointer to [**MCC6012**](MCC6012.md) |  | [optional] 
+**Merchantid** | **int32** | Identifies the merchant account to perform processing for. | 
+**NameOnCard** | Pointer to **string** | The card holder name as appears on the card such as MR N E BODY. Required for some acquirers.  | [optional] 
+**PaymentIntentId** | Pointer to **string** | A payment intent id previously registered that this transaction is linked to. | [optional] 
+**PreAuth** | Pointer to **string** | A policy value which determines whether a pre auth policy is enforced or bypassed.  Values are:   &#x60;0&#x60; for the default policy (default value if not supplied). Your default values are determined by your account manager on setup of the account.   &#x60;1&#x60; for an enforced policy.  Enforces pre-authorisation when it does not pre-auth by default.   &#x60;2&#x60; to bypass. Bypasses pre-authorisation when it is enabled to pre auth by default.   &#x60;3&#x60; to ignore. The same as the default policy (0). Although it currently mirrors the default, this option is included for compatibility with other policies.  | [optional] 
+**ShipTo** | Pointer to [**ContactDetails**](ContactDetails.md) |  | [optional] 
+**Tag** | Pointer to **[]string** |  | [optional] 
+**ThreedsToken** | Pointer to **string** | The threedsecure token generated by a call to /areq which may or may not be challenged. | [optional] 
+**Threedsecure** | Pointer to [**ThreeDSecure**](ThreeDSecure.md) |  | [optional] 
+**TransInfo** | Pointer to **string** | Further information that can be added to the transaction will display in reporting. Can be used for flexible values such as operator id. | [optional] 
+**TransType** | Pointer to **string** | The type of transaction being submitted. Normally this value is not required and your account manager may request that you set this field. | [optional] 
+**Uuid** | Pointer to **string** | A uuid for the session. The value tracks through 3ds session and therefore should be a valid v4 uuid. | [optional] 
+
+## Methods
+
+### NewAuthRequest
+
+`func NewAuthRequest(amount int32, identifier string, merchantid int32, ) *AuthRequest`
+
+NewAuthRequest instantiates a new AuthRequest object
+This constructor will assign default values to properties that have it defined,
+and makes sure properties required by API are set, but the set of arguments
+will change when the set of required properties is changed
+
+### NewAuthRequestWithDefaults
+
+`func NewAuthRequestWithDefaults() *AuthRequest`
+
+NewAuthRequestWithDefaults instantiates a new AuthRequest object
+This constructor will only assign default values to properties that have it defined,
+but it doesn't guarantee that properties required by API are set
+
+### GetAirlineData
+
+`func (o *AuthRequest) GetAirlineData() AirlineAdvice`
+
+GetAirlineData returns the AirlineData field if non-nil, zero value otherwise.
+
+### GetAirlineDataOk
+
+`func (o *AuthRequest) GetAirlineDataOk() (*AirlineAdvice, bool)`
+
+GetAirlineDataOk returns a tuple with the AirlineData field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetAirlineData
+
+`func (o *AuthRequest) SetAirlineData(v AirlineAdvice)`
+
+SetAirlineData sets AirlineData field to given value.
+
+### HasAirlineData
+
+`func (o *AuthRequest) HasAirlineData() bool`
+
+HasAirlineData returns a boolean if a field has been set.
+
+### GetAmount
+
+`func (o *AuthRequest) GetAmount() int32`
+
+GetAmount returns the Amount field if non-nil, zero value otherwise.
+
+### GetAmountOk
+
+`func (o *AuthRequest) GetAmountOk() (*int32, bool)`
+
+GetAmountOk returns a tuple with the Amount field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetAmount
+
+`func (o *AuthRequest) SetAmount(v int32)`
+
+SetAmount sets Amount field to given value.
+
+
+### GetAvsPostcodePolicy
+
+`func (o *AuthRequest) GetAvsPostcodePolicy() string`
+
+GetAvsPostcodePolicy returns the AvsPostcodePolicy field if non-nil, zero value otherwise.
+
+### GetAvsPostcodePolicyOk
+
+`func (o *AuthRequest) GetAvsPostcodePolicyOk() (*string, bool)`
+
+GetAvsPostcodePolicyOk returns a tuple with the AvsPostcodePolicy field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetAvsPostcodePolicy
+
+`func (o *AuthRequest) SetAvsPostcodePolicy(v string)`
+
+SetAvsPostcodePolicy sets AvsPostcodePolicy field to given value.
+
+### HasAvsPostcodePolicy
+
+`func (o *AuthRequest) HasAvsPostcodePolicy() bool`
+
+HasAvsPostcodePolicy returns a boolean if a field has been set.
+
+### GetBillTo
+
+`func (o *AuthRequest) GetBillTo() ContactDetails`
+
+GetBillTo returns the BillTo field if non-nil, zero value otherwise.
+
+### GetBillToOk
+
+`func (o *AuthRequest) GetBillToOk() (*ContactDetails, bool)`
+
+GetBillToOk returns a tuple with the BillTo field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetBillTo
+
+`func (o *AuthRequest) SetBillTo(v ContactDetails)`
+
+SetBillTo sets BillTo field to given value.
+
+### HasBillTo
+
+`func (o *AuthRequest) HasBillTo() bool`
+
+HasBillTo returns a boolean if a field has been set.
+
+### GetCardholderAgreement
+
+`func (o *AuthRequest) GetCardholderAgreement() string`
+
+GetCardholderAgreement returns the CardholderAgreement field if non-nil, zero value otherwise.
+
+### GetCardholderAgreementOk
+
+`func (o *AuthRequest) GetCardholderAgreementOk() (*string, bool)`
+
+GetCardholderAgreementOk returns a tuple with the CardholderAgreement field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetCardholderAgreement
+
+`func (o *AuthRequest) SetCardholderAgreement(v string)`
+
+SetCardholderAgreement sets CardholderAgreement field to given value.
+
+### HasCardholderAgreement
+
+`func (o *AuthRequest) HasCardholderAgreement() bool`
+
+HasCardholderAgreement returns a boolean if a field has been set.
+
+### GetCardnumber
+
+`func (o *AuthRequest) GetCardnumber() string`
+
+GetCardnumber returns the Cardnumber field if non-nil, zero value otherwise.
+
+### GetCardnumberOk
+
+`func (o *AuthRequest) GetCardnumberOk() (*string, bool)`
+
+GetCardnumberOk returns a tuple with the Cardnumber field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetCardnumber
+
+`func (o *AuthRequest) SetCardnumber(v string)`
+
+SetCardnumber sets Cardnumber field to given value.
+
+### HasCardnumber
+
+`func (o *AuthRequest) HasCardnumber() bool`
+
+HasCardnumber returns a boolean if a field has been set.
+
+### GetCpCardToken
+
+`func (o *AuthRequest) GetCpCardToken() string`
+
+GetCpCardToken returns the CpCardToken field if non-nil, zero value otherwise.
+
+### GetCpCardTokenOk
+
+`func (o *AuthRequest) GetCpCardTokenOk() (*string, bool)`
+
+GetCpCardTokenOk returns a tuple with the CpCardToken field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetCpCardToken
+
+`func (o *AuthRequest) SetCpCardToken(v string)`
+
+SetCpCardToken sets CpCardToken field to given value.
+
+### HasCpCardToken
+
+`func (o *AuthRequest) HasCpCardToken() bool`
+
+HasCpCardToken returns a boolean if a field has been set.
+
+### GetCsc
+
+`func (o *AuthRequest) GetCsc() string`
+
+GetCsc returns the Csc field if non-nil, zero value otherwise.
+
+### GetCscOk
+
+`func (o *AuthRequest) GetCscOk() (*string, bool)`
+
+GetCscOk returns a tuple with the Csc field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetCsc
+
+`func (o *AuthRequest) SetCsc(v string)`
+
+SetCsc sets Csc field to given value.
+
+### HasCsc
+
+`func (o *AuthRequest) HasCsc() bool`
+
+HasCsc returns a boolean if a field has been set.
+
+### GetCscPolicy
+
+`func (o *AuthRequest) GetCscPolicy() string`
+
+GetCscPolicy returns the CscPolicy field if non-nil, zero value otherwise.
+
+### GetCscPolicyOk
+
+`func (o *AuthRequest) GetCscPolicyOk() (*string, bool)`
+
+GetCscPolicyOk returns a tuple with the CscPolicy field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetCscPolicy
+
+`func (o *AuthRequest) SetCscPolicy(v string)`
+
+SetCscPolicy sets CscPolicy field to given value.
+
+### HasCscPolicy
+
+`func (o *AuthRequest) HasCscPolicy() bool`
+
+HasCscPolicy returns a boolean if a field has been set.
+
+### GetCurrency
+
+`func (o *AuthRequest) GetCurrency() string`
+
+GetCurrency returns the Currency field if non-nil, zero value otherwise.
+
+### GetCurrencyOk
+
+`func (o *AuthRequest) GetCurrencyOk() (*string, bool)`
+
+GetCurrencyOk returns a tuple with the Currency field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetCurrency
+
+`func (o *AuthRequest) SetCurrency(v string)`
+
+SetCurrency sets Currency field to given value.
+
+### HasCurrency
+
+`func (o *AuthRequest) HasCurrency() bool`
+
+HasCurrency returns a boolean if a field has been set.
+
+### GetDuplicatePolicy
+
+`func (o *AuthRequest) GetDuplicatePolicy() string`
+
+GetDuplicatePolicy returns the DuplicatePolicy field if non-nil, zero value otherwise.
+
+### GetDuplicatePolicyOk
+
+`func (o *AuthRequest) GetDuplicatePolicyOk() (*string, bool)`
+
+GetDuplicatePolicyOk returns a tuple with the DuplicatePolicy field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetDuplicatePolicy
+
+`func (o *AuthRequest) SetDuplicatePolicy(v string)`
+
+SetDuplicatePolicy sets DuplicatePolicy field to given value.
+
+### HasDuplicatePolicy
+
+`func (o *AuthRequest) HasDuplicatePolicy() bool`
+
+HasDuplicatePolicy returns a boolean if a field has been set.
+
+### GetEventManagement
+
+`func (o *AuthRequest) GetEventManagement() EventDataModel`
+
+GetEventManagement returns the EventManagement field if non-nil, zero value otherwise.
+
+### GetEventManagementOk
+
+`func (o *AuthRequest) GetEventManagementOk() (*EventDataModel, bool)`
+
+GetEventManagementOk returns a tuple with the EventManagement field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetEventManagement
+
+`func (o *AuthRequest) SetEventManagement(v EventDataModel)`
+
+SetEventManagement sets EventManagement field to given value.
+
+### HasEventManagement
+
+`func (o *AuthRequest) HasEventManagement() bool`
+
+HasEventManagement returns a boolean if a field has been set.
+
+### GetExpmonth
+
+`func (o *AuthRequest) GetExpmonth() int32`
+
+GetExpmonth returns the Expmonth field if non-nil, zero value otherwise.
+
+### GetExpmonthOk
+
+`func (o *AuthRequest) GetExpmonthOk() (*int32, bool)`
+
+GetExpmonthOk returns a tuple with the Expmonth field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetExpmonth
+
+`func (o *AuthRequest) SetExpmonth(v int32)`
+
+SetExpmonth sets Expmonth field to given value.
+
+### HasExpmonth
+
+`func (o *AuthRequest) HasExpmonth() bool`
+
+HasExpmonth returns a boolean if a field has been set.
+
+### GetExpyear
+
+`func (o *AuthRequest) GetExpyear() int32`
+
+GetExpyear returns the Expyear field if non-nil, zero value otherwise.
+
+### GetExpyearOk
+
+`func (o *AuthRequest) GetExpyearOk() (*int32, bool)`
+
+GetExpyearOk returns a tuple with the Expyear field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetExpyear
+
+`func (o *AuthRequest) SetExpyear(v int32)`
+
+SetExpyear sets Expyear field to given value.
+
+### HasExpyear
+
+`func (o *AuthRequest) HasExpyear() bool`
+
+HasExpyear returns a boolean if a field has been set.
+
+### GetExternalMpi
+
+`func (o *AuthRequest) GetExternalMpi() ExternalMPI`
+
+GetExternalMpi returns the ExternalMpi field if non-nil, zero value otherwise.
+
+### GetExternalMpiOk
+
+`func (o *AuthRequest) GetExternalMpiOk() (*ExternalMPI, bool)`
+
+GetExternalMpiOk returns a tuple with the ExternalMpi field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetExternalMpi
+
+`func (o *AuthRequest) SetExternalMpi(v ExternalMPI)`
+
+SetExternalMpi sets ExternalMpi field to given value.
+
+### HasExternalMpi
+
+`func (o *AuthRequest) HasExternalMpi() bool`
+
+HasExternalMpi returns a boolean if a field has been set.
+
+### GetIdentifier
+
+`func (o *AuthRequest) GetIdentifier() string`
+
+GetIdentifier returns the Identifier field if non-nil, zero value otherwise.
+
+### GetIdentifierOk
+
+`func (o *AuthRequest) GetIdentifierOk() (*string, bool)`
+
+GetIdentifierOk returns a tuple with the Identifier field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetIdentifier
+
+`func (o *AuthRequest) SetIdentifier(v string)`
+
+SetIdentifier sets Identifier field to given value.
+
+
+### GetInitiation
+
+`func (o *AuthRequest) GetInitiation() string`
+
+GetInitiation returns the Initiation field if non-nil, zero value otherwise.
+
+### GetInitiationOk
+
+`func (o *AuthRequest) GetInitiationOk() (*string, bool)`
+
+GetInitiationOk returns a tuple with the Initiation field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetInitiation
+
+`func (o *AuthRequest) SetInitiation(v string)`
+
+SetInitiation sets Initiation field to given value.
+
+### HasInitiation
+
+`func (o *AuthRequest) HasInitiation() bool`
+
+HasInitiation returns a boolean if a field has been set.
+
+### GetMatchAvsa
+
+`func (o *AuthRequest) GetMatchAvsa() string`
+
+GetMatchAvsa returns the MatchAvsa field if non-nil, zero value otherwise.
+
+### GetMatchAvsaOk
+
+`func (o *AuthRequest) GetMatchAvsaOk() (*string, bool)`
+
+GetMatchAvsaOk returns a tuple with the MatchAvsa field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetMatchAvsa
+
+`func (o *AuthRequest) SetMatchAvsa(v string)`
+
+SetMatchAvsa sets MatchAvsa field to given value.
+
+### HasMatchAvsa
+
+`func (o *AuthRequest) HasMatchAvsa() bool`
+
+HasMatchAvsa returns a boolean if a field has been set.
+
+### GetMcc6012
+
+`func (o *AuthRequest) GetMcc6012() MCC6012`
+
+GetMcc6012 returns the Mcc6012 field if non-nil, zero value otherwise.
+
+### GetMcc6012Ok
+
+`func (o *AuthRequest) GetMcc6012Ok() (*MCC6012, bool)`
+
+GetMcc6012Ok returns a tuple with the Mcc6012 field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetMcc6012
+
+`func (o *AuthRequest) SetMcc6012(v MCC6012)`
+
+SetMcc6012 sets Mcc6012 field to given value.
+
+### HasMcc6012
+
+`func (o *AuthRequest) HasMcc6012() bool`
+
+HasMcc6012 returns a boolean if a field has been set.
+
+### GetMerchantid
+
+`func (o *AuthRequest) GetMerchantid() int32`
+
+GetMerchantid returns the Merchantid field if non-nil, zero value otherwise.
+
+### GetMerchantidOk
+
+`func (o *AuthRequest) GetMerchantidOk() (*int32, bool)`
+
+GetMerchantidOk returns a tuple with the Merchantid field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetMerchantid
+
+`func (o *AuthRequest) SetMerchantid(v int32)`
+
+SetMerchantid sets Merchantid field to given value.
+
+
+### GetNameOnCard
+
+`func (o *AuthRequest) GetNameOnCard() string`
+
+GetNameOnCard returns the NameOnCard field if non-nil, zero value otherwise.
+
+### GetNameOnCardOk
+
+`func (o *AuthRequest) GetNameOnCardOk() (*string, bool)`
+
+GetNameOnCardOk returns a tuple with the NameOnCard field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetNameOnCard
+
+`func (o *AuthRequest) SetNameOnCard(v string)`
+
+SetNameOnCard sets NameOnCard field to given value.
+
+### HasNameOnCard
+
+`func (o *AuthRequest) HasNameOnCard() bool`
+
+HasNameOnCard returns a boolean if a field has been set.
+
+### GetPaymentIntentId
+
+`func (o *AuthRequest) GetPaymentIntentId() string`
+
+GetPaymentIntentId returns the PaymentIntentId field if non-nil, zero value otherwise.
+
+### GetPaymentIntentIdOk
+
+`func (o *AuthRequest) GetPaymentIntentIdOk() (*string, bool)`
+
+GetPaymentIntentIdOk returns a tuple with the PaymentIntentId field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetPaymentIntentId
+
+`func (o *AuthRequest) SetPaymentIntentId(v string)`
+
+SetPaymentIntentId sets PaymentIntentId field to given value.
+
+### HasPaymentIntentId
+
+`func (o *AuthRequest) HasPaymentIntentId() bool`
+
+HasPaymentIntentId returns a boolean if a field has been set.
+
+### GetPreAuth
+
+`func (o *AuthRequest) GetPreAuth() string`
+
+GetPreAuth returns the PreAuth field if non-nil, zero value otherwise.
+
+### GetPreAuthOk
+
+`func (o *AuthRequest) GetPreAuthOk() (*string, bool)`
+
+GetPreAuthOk returns a tuple with the PreAuth field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetPreAuth
+
+`func (o *AuthRequest) SetPreAuth(v string)`
+
+SetPreAuth sets PreAuth field to given value.
+
+### HasPreAuth
+
+`func (o *AuthRequest) HasPreAuth() bool`
+
+HasPreAuth returns a boolean if a field has been set.
+
+### GetShipTo
+
+`func (o *AuthRequest) GetShipTo() ContactDetails`
+
+GetShipTo returns the ShipTo field if non-nil, zero value otherwise.
+
+### GetShipToOk
+
+`func (o *AuthRequest) GetShipToOk() (*ContactDetails, bool)`
+
+GetShipToOk returns a tuple with the ShipTo field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetShipTo
+
+`func (o *AuthRequest) SetShipTo(v ContactDetails)`
+
+SetShipTo sets ShipTo field to given value.
+
+### HasShipTo
+
+`func (o *AuthRequest) HasShipTo() bool`
+
+HasShipTo returns a boolean if a field has been set.
+
+### GetTag
+
+`func (o *AuthRequest) GetTag() []string`
+
+GetTag returns the Tag field if non-nil, zero value otherwise.
+
+### GetTagOk
+
+`func (o *AuthRequest) GetTagOk() (*[]string, bool)`
+
+GetTagOk returns a tuple with the Tag field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetTag
+
+`func (o *AuthRequest) SetTag(v []string)`
+
+SetTag sets Tag field to given value.
+
+### HasTag
+
+`func (o *AuthRequest) HasTag() bool`
+
+HasTag returns a boolean if a field has been set.
+
+### GetThreedsToken
+
+`func (o *AuthRequest) GetThreedsToken() string`
+
+GetThreedsToken returns the ThreedsToken field if non-nil, zero value otherwise.
+
+### GetThreedsTokenOk
+
+`func (o *AuthRequest) GetThreedsTokenOk() (*string, bool)`
+
+GetThreedsTokenOk returns a tuple with the ThreedsToken field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetThreedsToken
+
+`func (o *AuthRequest) SetThreedsToken(v string)`
+
+SetThreedsToken sets ThreedsToken field to given value.
+
+### HasThreedsToken
+
+`func (o *AuthRequest) HasThreedsToken() bool`
+
+HasThreedsToken returns a boolean if a field has been set.
+
+### GetThreedsecure
+
+`func (o *AuthRequest) GetThreedsecure() ThreeDSecure`
+
+GetThreedsecure returns the Threedsecure field if non-nil, zero value otherwise.
+
+### GetThreedsecureOk
+
+`func (o *AuthRequest) GetThreedsecureOk() (*ThreeDSecure, bool)`
+
+GetThreedsecureOk returns a tuple with the Threedsecure field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetThreedsecure
+
+`func (o *AuthRequest) SetThreedsecure(v ThreeDSecure)`
+
+SetThreedsecure sets Threedsecure field to given value.
+
+### HasThreedsecure
+
+`func (o *AuthRequest) HasThreedsecure() bool`
+
+HasThreedsecure returns a boolean if a field has been set.
+
+### GetTransInfo
+
+`func (o *AuthRequest) GetTransInfo() string`
+
+GetTransInfo returns the TransInfo field if non-nil, zero value otherwise.
+
+### GetTransInfoOk
+
+`func (o *AuthRequest) GetTransInfoOk() (*string, bool)`
+
+GetTransInfoOk returns a tuple with the TransInfo field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetTransInfo
+
+`func (o *AuthRequest) SetTransInfo(v string)`
+
+SetTransInfo sets TransInfo field to given value.
+
+### HasTransInfo
+
+`func (o *AuthRequest) HasTransInfo() bool`
+
+HasTransInfo returns a boolean if a field has been set.
+
+### GetTransType
+
+`func (o *AuthRequest) GetTransType() string`
+
+GetTransType returns the TransType field if non-nil, zero value otherwise.
+
+### GetTransTypeOk
+
+`func (o *AuthRequest) GetTransTypeOk() (*string, bool)`
+
+GetTransTypeOk returns a tuple with the TransType field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetTransType
+
+`func (o *AuthRequest) SetTransType(v string)`
+
+SetTransType sets TransType field to given value.
+
+### HasTransType
+
+`func (o *AuthRequest) HasTransType() bool`
+
+HasTransType returns a boolean if a field has been set.
+
+### GetUuid
+
+`func (o *AuthRequest) GetUuid() string`
+
+GetUuid returns the Uuid field if non-nil, zero value otherwise.
+
+### GetUuidOk
+
+`func (o *AuthRequest) GetUuidOk() (*string, bool)`
+
+GetUuidOk returns a tuple with the Uuid field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetUuid
+
+`func (o *AuthRequest) SetUuid(v string)`
+
+SetUuid sets Uuid field to given value.
+
+### HasUuid
+
+`func (o *AuthRequest) HasUuid() bool`
+
+HasUuid returns a boolean if a field has been set.
+
+
+[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+
+
